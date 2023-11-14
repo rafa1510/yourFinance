@@ -14,3 +14,11 @@ function toggleMenu()
         links.setAttribute("style", "visibility: visible");
     }
 }
+
+// Logo slide in animation
+
+const title = document.querySelector(".titleContainer")
+
+title.addEventListener("animationend", () => {
+    title.setAttribute("style", "display: none");
+})
