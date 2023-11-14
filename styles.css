@@ -57,8 +57,8 @@ button
     justify-content: center;
     align-items: center;
     background-color: #78C2AD;
-    animation: 1s ease-in 1.5s 1 slideOutFromBottom;
-    position: relative;
+    animation: 800ms ease-in 1.5s 1 slideOutFromBottom;
+    position: absolute;
 }
 
 .titleLogoContainer
@@ -180,6 +180,7 @@ button
     display: flex;
     justify-content: center;
     align-items: center;
+    text-align: center;
 }
 
 .loginForm
