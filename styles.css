@@ -237,8 +237,29 @@ button
     color: white;
 }
 
+.loginButton:hover
+{
+    background-color: #56b399;
+}
+
+.loginButton:active
+{
+    background-color: #F3969A;
+}
+
 .guestButton
 {
-    background-color: white;
+    background-color: #ffffff;
     color: black;
+}
+
+.guestButton:hover
+{
+   background-color: #e6e6e6; 
+}
+
+.guestButton:active
+{
+   background-color: #F3969A;
+   color: white; 
 }
