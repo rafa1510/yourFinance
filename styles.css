@@ -29,7 +29,7 @@ body
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
-    padding: 20px;
+    padding: 4vw;
 }
 
 .titleLogo
