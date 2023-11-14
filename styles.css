@@ -26,6 +26,15 @@ ul{
 
 /* Title Page */
 
+@keyframes slideOutFromBottom {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-100%);
+    }
+  }
+
 .titleContainer
 {
     height: 100vh;
@@ -34,6 +43,7 @@ ul{
     justify-content: center;
     align-items: center;
     background-color: #78C2AD;
+    animation: 2s ease-out 2s 1 slideOutFromBottom;
 }
 
 .titleLogoContainer
