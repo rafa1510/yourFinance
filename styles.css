@@ -12,7 +12,9 @@ body
 {
     height: 100vh;
     width: 100vw;
-    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 a
@@ -156,4 +158,34 @@ ul{
         align-items: center;
         transition: all 0.5s ease-out;
     }
+}
+
+/* Log In Form */
+
+.contentContainer
+{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loginForm
+{
+    display: flex;
+    flex-direction: column;
+    border: 0.5px solid black;
+    border-top: none;
+}
+
+.credentialsForm
+{
+    width: 16.25rem;
+    height: 2.5rem;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    border-top: 0.5px solid black;
+    padding-left: 0.5rem;
+    font-weight: 500;
 }
