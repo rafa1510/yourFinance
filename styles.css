@@ -43,7 +43,8 @@ ul{
     justify-content: center;
     align-items: center;
     background-color: #78C2AD;
-    animation: 2s ease-out 2s 1 slideOutFromBottom;
+    animation: 1s ease-in 2s 1 slideOutFromBottom;
+    position: relative;
 }
 
 .titleLogoContainer
@@ -76,6 +77,7 @@ ul{
     align-items: center;
     justify-content: space-between;
     overflow: hidden;
+    position: absolute;
 }
 
 .navbarMobileTop
