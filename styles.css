@@ -26,6 +26,17 @@ ul{
     list-style: none;
 }
 
+input
+{
+    border: none;
+    outline: none;
+}
+
+::placeholder
+{
+    color: black;
+}
+
 /* Title Page */
 
 @keyframes slideOutFromBottom {
