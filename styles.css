@@ -189,6 +189,7 @@ button
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    margin-bottom: 40vh;
 }
 
 .credentialsContainer
