@@ -43,7 +43,7 @@ ul{
     justify-content: center;
     align-items: center;
     background-color: #78C2AD;
-    animation: 1s ease-in 2s 1 slideOutFromBottom;
+    animation: 1s ease-in 1.5s 1 slideOutFromBottom;
     position: relative;
 }
 
