@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
+    <!-- Load AJAX API for Google Chart -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script defer src="script.js"></script>
     <!-- Import Roboto font from Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,6 +58,10 @@
                     <h2 class="accountName">Chase Savings</h2>
                     <h2 class="accountTotal">$1,784</h2>
                 </div>
+            </div>
+            <div class="chartContainer">
+                <h2 class="chartTitle">Net Worth</h2>
+                <div id="chart_div"></div>
             </div>
         </div>
     </div>

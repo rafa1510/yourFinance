@@ -279,7 +279,6 @@ button
 .accountItemsContainer
 {
     width: 20rem;
-    min-height: 10rem;
     border-top: 1px solid #000;
     display: flex;
     flex-direction: column;
@@ -329,4 +328,29 @@ button
     font-size: 1.25rem;
     font-style: italic;
     font-weight: 400;
+}
+
+/* Chart */
+
+.chartContainer
+{
+    border-top: 1px solid #000;
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    box-sizing: border-box;
+}
+
+.chartTitle
+{
+    font-size: 1.75rem;
+    font-weight: 500;
+    padding: 1rem;
+    padding-bottom: 0;
+}
+
+#chart_div
+{
+    width: 20rem;
+    height: 20rem;
 }

@@ -1,3 +1,13 @@
+// Logo slide in animation
+
+/*
+const title = document.querySelector(".titleContainer")
+
+title.addEventListener("animationend", () => {
+    title.setAttribute("style", "display: none");
+})
+*/
+
 // Mobile menu interactivity
 function toggleMenu()
 {
@@ -15,10 +25,33 @@ function toggleMenu()
     }
 }
 
-// Logo slide in animation
+// Google Chart
 
-const title = document.querySelector(".titleContainer")
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawChart);
 
-title.addEventListener("animationend", () => {
-    title.setAttribute("style", "display: none");
-})
+function drawChart() 
+{
+  var data = google.visualization.arrayToDataTable
+    (
+        [
+            ['Month', 'Total'],
+            ['Jan',  1000],
+            ['Feb',  1170],
+            ['Mar',  1339],
+            ['Apr',  1784]
+        ]
+    );
+
+  var options = 
+  {
+    theme: 'material',
+    curveType: 'function',
+    legend: 'none',
+    chartArea:{left:60,right:10, width:"100%", height:"80%"}
+  };
+
+  var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+
+  chart.draw(data, options);
+}
