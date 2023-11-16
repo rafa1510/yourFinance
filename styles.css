@@ -140,7 +140,7 @@ button
     .navbarContainer
     {
         flex-wrap: wrap;
-        transition: all 0.5s ease-out;
+        transition: height 0.5s ease-out;
     }
 
     .navbarMobileTop
