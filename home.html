@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <!-- Load AJAX API for Google Chart -->
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script defer src="script.js"></script>
+    <!-- Load script for Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <!-- Import Roboto font from Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,7 +61,9 @@
             </div>
             <div class="chartContainer">
                 <h2 class="chartTitle">Net Worth</h2>
-                <div id="chart_div"></div>
+                <div class="canvasContainer">
+                    <canvas id="myChart">
+                </div>
             </div>
         </div>
     </div>

@@ -286,8 +286,6 @@ button
     gap: 0.75rem;
     box-sizing: border-box;
     padding: 1rem;
-    padding-top: 2rem;
-    padding-bottom: 2.5rem;
 }
 
 .typeContainer,
@@ -337,12 +335,11 @@ button
 {
     border: 1px solid #000; 
     margin: -1px;
-    height: 20rem;
-    width: 20rem;
     display: flex;
     flex-direction: column;
     align-items: baseline;
     box-sizing: border-box;
+    position: relative;
 }
 
 .chartTitle
@@ -350,11 +347,16 @@ button
     font-size: 1.75rem;
     font-weight: 500;
     padding: 1rem;
-    padding-bottom: 0;
 }
 
-#chart_div
+.canvasContainer
 {
-    width: 20rem;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin: -1px;
     height: 20rem;
+    width: 20rem;
 }

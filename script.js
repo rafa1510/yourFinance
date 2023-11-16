@@ -25,33 +25,52 @@ function toggleMenu()
     }
 }
 
-// Google Chart
+// Chart.js
+const data = {
+  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+  datasets: [{
+    label: 'Weekly Sales',
+    data: [1800, 1650, 1940, 2068, 2345, 2934, 3068],
+    backgroundColor: [
+      'rgba(255, 26, 104, 0.2)',
+      'rgba(54, 162, 235, 0.2)',
+      'rgba(255, 206, 86, 0.2)',
+      'rgba(75, 192, 192, 0.2)',
+      'rgba(153, 102, 255, 0.2)',
+      'rgba(255, 159, 64, 0.2)',
+      'rgba(0, 0, 0, 0.2)'
+    ],
+    borderColor: [
+      'rgba(255, 26, 104, 1)',
+      'rgba(54, 162, 235, 1)',
+      'rgba(255, 206, 86, 1)',
+      'rgba(75, 192, 192, 1)',
+      'rgba(153, 102, 255, 1)',
+      'rgba(255, 159, 64, 1)',
+      'rgba(0, 0, 0, 1)'
+    ],
+    borderWidth: 1,
+    pointStyle: false
+  }]
+};
 
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(drawChart);
+// config 
+const config = {
+  type: 'line',
+  data,
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      }
+    }
+  }
+};
 
-function drawChart() 
-{
-  var data = google.visualization.arrayToDataTable
-    (
-        [
-            ['Month', 'Total'],
-            ['Jan',  1000],
-            ['Feb',  1170],
-            ['Mar',  1339],
-            ['Apr',  1784]
-        ]
-    );
-
-  var options = 
-  {
-    theme: 'material',
-    curveType: 'function',
-    legend: 'none',
-    chartArea:{left:60,right:10, width:"100%", height:"80%"}
-  };
-
-  var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-
-  chart.draw(data, options);
-}
+// render init block
+const myChart = new Chart(
+  document.getElementById('myChart'),
+  config
+);
