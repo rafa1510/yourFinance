@@ -13,6 +13,8 @@ body
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    height: 100vh;
+    width: 100vw;
 }
 
 a
@@ -57,6 +59,7 @@ button
     background-color: #78C2AD;
     animation: 800ms ease-in 1.5s 1 slideOutFromBottom;
     position: absolute;
+    animation-fill-mode: forwards;
 }
 
 .titleLogoContainer
@@ -176,14 +179,25 @@ button
 
 .contentContainer
 {
-    min-height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+    margin-top: 5rem;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    min-height: 0;
+    position: relative;
 }
 
 /* Log In Form */
+
+.loginContainer
+{
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
 .loginForm
 {
@@ -191,12 +205,6 @@ button
     flex-direction: column;
     gap: 1rem;
     margin-top: -40vh;
-}
-
-.credentialsContainer
-{
-    border: 0.5px solid black;
-    border-top: none;
 }
 
 .loginButtonContainer
@@ -217,6 +225,12 @@ button
     align-items: center;
     padding-left: 0.5rem;
     font-weight: 500;
+}
+
+.credentialsContainer
+{
+    border: 0.5px solid black;
+    border-top: none;
 }
 
 .credentialsForm
@@ -269,17 +283,15 @@ button
 
 .accountsContainer
 {
-    border: 1px solid #000;
-    border-top: none;
-    box-shadow: 2px 2px 0px 0px #000;
-    margin-top: 6rem;
-    margin-bottom: 1rem;
+    display: flex;
+    flex-grow: 1;
+    min-width: 0;
+    min-height: 0;
 }
 
 .accountItemsContainer
 {
     width: 20rem;
-    border-top: 1px solid #000;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
@@ -308,11 +320,6 @@ button
     font-weight: 700;
 }
 
-.accountItem
-{
-
-}
-
 .accountName
 {
     font-size: 1.25rem;
@@ -332,19 +339,18 @@ button
 
 .chartContainer
 {
-    border-top: 1px solid #000; 
     display: flex;
     flex-direction: column;
-    align-items: baseline;
     box-sizing: border-box;
-    position: relative;
+    flex-grow: 1;
+    min-width: 0;
+    min-height: 0;
 }
 
 .canvasTitle
 {
     display: flex;
     justify-content: space-between;
-    width: 100%;
     box-sizing: border-box;
     padding: 1rem;
 }
@@ -362,14 +368,14 @@ button
 .canvasContainer
 {
     display: flex;
-    flex-direction: column;
     box-sizing: border-box;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
     padding-bottom: 0.5rem;
-    margin: -1px;
-    height: 20rem;
-    width: 20rem;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 20rem;
+    min-height: 20rem;
 }
 
 .leftContainer
@@ -386,27 +392,11 @@ button
     border: 0.5px solid black;
 }
 
-
-/* Bigger content for PC */
-
 @media screen and (min-width: 750px)
 {
-    .accountsContainer
-    {
-        display: flex;
-        border-top: 1px solid #000
-    }
-
-    .accountItemsContainer
-    {
-        border-top: none;
-        border-bottom: 1px solid #000;
-    }
-
     .chartContainer
     {
-        border-top: none;
-        border-left: 1px solid #000;
+        box-shadow:  rgba(27, 31, 35, 0.15) -1.5px 0px 0px 0px;
     }
 
     .chartButton
@@ -416,40 +406,32 @@ button
 
     .canvasContainer
     {
-        width: 25rem;
-        height: 25rem;
         padding-left: 1rem;
         padding-right: 1rem;
         padding-bottom: 1rem;
     }
 }
 
-@media screen and (min-width: 1000px)
+@media screen and (max-width: 750px)
 {
-    .canvasContainer
-    {
-        width: 40rem;
-        height: 30rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
-        padding-bottom: 1rem;
-    }
-}
 
-@media screen and (min-width: 1500px)
-{
-    .canvasContainer
+    .chartContainer
     {
-        width: 50rem;
-        height: 37.5rem;
+        box-shadow:  rgba(27, 31, 35, 0.15) 0px -1.5px 0px 0px;
     }
-}
 
-@media screen and (min-width: 2000px)
-{
-    .canvasContainer
+    .accountItemsContainer
     {
-        width: 60rem;
-        height: 45rem;
+        width: 100%;
+    }
+
+    .contentContainer
+    {
+        flex-direction: column;
+    }
+
+    .accountsContainer
+    {
+        flex-direction: column;
     }
 }
