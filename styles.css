@@ -380,13 +380,24 @@ button
     min-height: 20rem;
 }
 
-.chartButton
+.lineButton,
+.barButton
 {
+    justify-self: end;
     width: 2rem;
     height: 2rem;
-    background-color: white;
     box-shadow: 2px 2px 0px 0px #000;
     border: 0.5px solid black;
+}
+
+.lineButton
+{
+    background: url('chartButton.svg');
+}
+
+.barButton
+{
+    background: url('barButton.svg');
 }
 
 @media screen and (min-width: 750px)
@@ -396,7 +407,7 @@ button
         box-shadow:  rgba(27, 31, 35, 0.15) -1.5px 0px 0px 0px;
     }
 
-    .chartButton
+    .barButton
     {
         margin-right: 0.5rem;
     }
