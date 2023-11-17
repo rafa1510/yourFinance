@@ -82,7 +82,8 @@ button
 
 /* Navbar */
 
-.navbarContainer
+.navbarContainer,
+.loginNavbarContainer
 {
     background-color: #78C2AD;
     display: flex;
@@ -140,7 +141,8 @@ button
 @media screen and (max-width: 750px)
 {
 
-    .navbarContainer
+    .navbarContainer,
+    .loginNavbarContainer
     {
         flex-wrap: wrap;
         transition: height 0.5s ease-out;
@@ -155,7 +157,6 @@ button
     {
         display: block;
         visibility: hidden;
-        
     }
 
     .menuContainer
@@ -185,7 +186,6 @@ button
     flex-shrink: 1;
     min-width: 0;
     min-height: 0;
-    position: relative;
 }
 
 /* Log In Form */
