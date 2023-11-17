@@ -236,6 +236,8 @@ button
 .credentialsForm
 {
     border-top: 0.5px solid black;
+    -webkit-appearance: none;
+    border-radius: 0;
 }
 
 .loginButton,
@@ -378,11 +380,6 @@ button
     min-height: 20rem;
 }
 
-.leftContainer
-{
-
-}
-
 .chartButton
 {
     width: 2rem;
@@ -412,7 +409,7 @@ button
     }
 }
 
-@media screen and (max-width: 750px)
+@media screen and (max-width: 1000px)
 {
 
     .chartContainer
@@ -435,3 +432,4 @@ button
         flex-direction: column;
     }
 }
+
