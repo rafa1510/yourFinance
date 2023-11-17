@@ -134,7 +134,7 @@ button
 
 /* Responsive Navbar for mobile */
 
-@media screen and (max-width: 1000px)
+@media screen and (max-width: 750px)
 {
 
     .navbarContainer
@@ -340,11 +340,23 @@ button
     position: relative;
 }
 
+.canvasTitle
+{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1rem;
+}
+
 .chartTitle
 {
     font-size: 1.75rem;
     font-weight: 500;
-    padding: 1rem;
+}
+
+.chartButton
+{
 }
 
 .canvasContainer
@@ -354,6 +366,7 @@ button
     box-sizing: border-box;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+    padding-bottom: 0.5rem;
     margin: -1px;
     height: 20rem;
     width: 20rem;
@@ -364,9 +377,19 @@ button
 
 }
 
+.chartButton
+{
+    width: 2rem;
+    height: 2rem;
+    background-color: white;
+    box-shadow: 2px 2px 0px 0px #000;
+    border: 0.5px solid black;
+}
+
+
 /* Bigger content for PC */
 
-@media screen and (min-width: 1000px)
+@media screen and (min-width: 750px)
 {
     .accountsContainer
     {
@@ -386,9 +409,47 @@ button
         border-left: 1px solid #000;
     }
 
+    .chartButton
+    {
+        margin-right: 0.5rem;
+    }
+
+    .canvasContainer
+    {
+        width: 25rem;
+        height: 25rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-bottom: 1rem;
+    }
+}
+
+@media screen and (min-width: 1000px)
+{
     .canvasContainer
     {
         width: 40rem;
-        height: 40rem;
+        height: 30rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-bottom: 1rem;
+    }
+}
+
+@media screen and (min-width: 1500px)
+{
+    .canvasContainer
+    {
+        width: 50rem;
+        height: 37.5rem;
+    }
+}
+
+@media screen and (min-width: 2000px)
+{
+    .canvasContainer
+    {
+        width: 60rem;
+        height: 45rem;
     }
 }
