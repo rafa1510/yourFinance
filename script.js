@@ -141,7 +141,9 @@ function createLineChart()
       ],
       borderWidth: 3,
       borderColor: '#6cc3d5',
-      pointStyle: false
+      pointStyle: false,
+      pointradius: 15,
+      radius: 15
     }]
   };
 
