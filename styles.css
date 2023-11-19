@@ -216,7 +216,8 @@ button
 
 .credentialsForm,
 .loginButton,
-.guestButton
+.guestButton,
+.transactionInput
 {
     width: 16.25rem;
     height: 2.5rem;
@@ -224,6 +225,7 @@ button
     display: flex;
     align-items: center;
     padding-left: 0.5rem;
+    padding-right: 0.5rem;
     font-weight: 500;
 }
 
@@ -339,7 +341,8 @@ button
 
 /* Chart */
 
-.rightContainer
+.rightContainer,
+.addTransactionContainer
 {
     display: flex;
     flex-direction: column;
@@ -409,7 +412,8 @@ button
     {
         margin-right: 0.5rem;
     }
-    .rightContainer
+    .rightContainer,
+    .addTransactionContainer
     {
         box-shadow:  rgba(27, 31, 35, 0.15) -1.5px 0px 0px 0px;
     }
@@ -433,7 +437,8 @@ button
 @media screen and (max-width: 1000px)
 {
 
-    .rightContainer
+    .rightContainer,
+    .addTransactionContainer
     {
         box-shadow:  rgba(27, 31, 35, 0.15) 0px -1.5px 0px 0px;
     }
@@ -581,4 +586,52 @@ button
     {
         width: 30%;
     }
+}
+
+/* Add transaction styling */
+
+.addTransactionContainer
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.addTransactionContainer form
+{
+    padding-top: 1rem;
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.addTransactionContainer h2
+{
+    display: flex;
+    justify-content: center;
+}
+
+.transactionFormRow
+{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.transactionSubtitle
+{
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.transactionInput
+{
+    width: 14rem;
+    height: 2.25rem;
+    border: 0.5px solid black;
+    -webkit-appearance: none;
+    border-radius: 0;
+    font-weight: 400;
+    background-color: white;
 }
