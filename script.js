@@ -21,7 +21,7 @@ function toggleMenu()
     }
     else
     {
-        navbar.setAttribute("style", "height: 14rem");
+        navbar.setAttribute("style", "height: 17rem");
         links.setAttribute("style", "visibility: visible");
     }
 }
