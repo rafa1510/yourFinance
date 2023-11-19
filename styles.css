@@ -368,47 +368,50 @@ button
 {
     display: flex;
     box-sizing: border-box;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    padding-bottom: 0.5rem;
     flex-grow: 1;
     flex-shrink: 1;
     min-width: 20rem;
     min-height: 20rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.chartButtonContainer
+{
+    display: flex;
+    border: 1px solid black;
+    box-shadow: 2px 2px 0px 0px #000;
 }
 
 .lineButton,
-.barButton
+.barButton,
+.transactionButton
 {
-    justify-self: end;
-    width: 2rem;
-    height: 2rem;
-    box-shadow: 2px 2px 0px 0px #000;
-    border: 0.5px solid black;
-}
-
-.lineButton
-{
-    background: url('chartButton.svg');
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    width: 32px;
+    height: 32px; 
 }
 
 .barButton
 {
-    background: url('barButton.svg');
+    border-left: 1px solid black;
 }
 
 /* Bigger padding for PC */
 
-@media screen and (min-width: 750px)
+@media screen and (min-width: 1000px)
 {
+    .chartButtonContainer
+    {
+        margin-right: 0.5rem;
+    }
     .rightContainer
     {
         box-shadow:  rgba(27, 31, 35, 0.15) -1.5px 0px 0px 0px;
-    }
-
-    .barButton
-    {
-        margin-right: 0.5rem;
     }
 
     .canvasContainer,
@@ -453,6 +456,7 @@ button
     flex-grow: 0;
     min-width: 0rem;
     min-height: 0rem;
+    width: 100%;
 }
 
 .transactionsTable
@@ -461,6 +465,7 @@ button
     flex-direction: column;
     flex-grow: 1;
     box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+    width: 100%;
 }
 
 .transactionRow,
@@ -470,8 +475,8 @@ button
     justify-content: space-between;
 }
 
-.transactionRow td,
-.transactionHeader th
+.transactionHeader th,
+.transactionRow td
 {
     display: flex;
     justify-content: baseline;
@@ -488,9 +493,29 @@ button
     background-color: #f5f5f5;
 }
 
-/* Table Styling for PC */
-@media screen and (min-width: 750px)
+/
+.transactionName,
+.transactionCategory,
+.transactionAccount,
+.transactionAmount
 {
+    overflow-wrap: anywhere;
+}
+
+.transactionAmount
+{
+    justify-content: center;
+}
+
+/* Table Styling for PC */
+@media screen and (min-width: 1000px)
+{
+    .transactionsContainer
+    {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+    
     .transactionDate
     {
         width: 5%;
@@ -513,7 +538,6 @@ button
 
     .transactionAmount
     {
-        justify-content: center;
         width: 10%;
     }
 }
@@ -521,46 +545,35 @@ button
 /* Table Styling for Mobile */
 @media screen and (max-width: 1000px)
 {
-
-    .transactionsContainer
-    {
-        width: 100%;
-    }
-
-    .transactionRow td,
-    .transactionHeader th
-    {
-        padding: 0.5rem;
-        font-size: 16px;
-    }
-
     .transactionsTable
     {
-        width: 100%;
+        margin-left: 10px;
+        margin-right: 10px;
     }
-
     .transactionDate
     {
-        width: 10%;
+        width: 10%
     }
 
     .transactionName
     {
-        width: 30%;
+        width: 60%;
     }
 
     .transactionCategory
     {
-        width: 20%;
+        visibility: collapse;
+        position: fixed;
     }
 
     .transactionAccount
     {
-        width: 25%;
+        visibility: collapse;
+        position: fixed;
     }
 
     .transactionAmount
     {
-        width: 15%;
+        width: 30%;
     }
 }

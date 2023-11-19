@@ -51,6 +51,9 @@ const barButton = document.querySelector(".barButton");
 
 const chartTitle = document.querySelector(".chartTitle")
 
+// Chart container to add/remove margin
+const chartContainer = document.querySelector(".canvasContainer")
+
 // Main functions to create the charts
 
 function createBarChart() 
@@ -85,6 +88,7 @@ function createBarChart()
     type: 'bar',
     data,
     options: {
+      
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -106,6 +110,8 @@ function createBarChart()
     chartTitle.textContent = 'Net Worth';
     barChart.destroy();
     createLineChart();
+    // Remove margin for Bar Chart
+    chartContainer.setAttribute("style", "margin-right: 0px");
   })  
 }
 
@@ -167,6 +173,8 @@ function createLineChart()
     chartTitle.textContent = 'Expenses vs Income';
     lineChart.destroy();
     createBarChart();
+    // Add margin for Bar Chart
+    chartContainer.setAttribute("style", "margin-right: 12px");
   })
 }
 
