@@ -27,7 +27,8 @@ ul{
 }
 
 input,
-button
+button,
+select
 {
     border: none;
     outline: none;
