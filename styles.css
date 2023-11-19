@@ -299,6 +299,15 @@ select
     overflow: hidden;
 }
 
+.hoverContent
+{
+    max-width: 1600px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-grow: 1;
+}
+
 .accountItemsContainer
 {
     width: 20rem;
@@ -353,6 +362,11 @@ select
 
 /* Chart */
 
+.rightContainer
+{
+    align-items: center;
+}
+
 .rightContainer,
 .addTransactionContainer
 {
@@ -376,6 +390,12 @@ select
 {
     font-size: 1.75rem;
     font-weight: 500;
+}
+
+.canvasContainer
+{
+    background-color: white;
+    padding-top: 1rem;
 }
 
 .canvasContainer,
