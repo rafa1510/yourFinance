@@ -110,8 +110,6 @@ function createBarChart()
     chartTitle.textContent = 'Net Worth';
     barChart.destroy();
     createLineChart();
-    // Remove margin for Bar Chart
-    chartContainer.setAttribute("style", "margin-right: 0px");
   })  
 }
 
@@ -173,8 +171,6 @@ function createLineChart()
     chartTitle.textContent = 'Expenses vs Income';
     lineChart.destroy();
     createBarChart();
-    // Add margin for Bar Chart
-    chartContainer.setAttribute("style", "margin-right: 12px");
   })
 }
 

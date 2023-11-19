@@ -1,6 +1,0 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="transactionButton">
-<rect id="button" width="32" height="32" fill="white"/>
-<path id="Vector" d="M26 8L6 8M26 15L6 15M26 22L6 22" stroke="black" stroke-width="4"/>
-</g>
-</svg>
