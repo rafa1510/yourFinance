@@ -293,6 +293,11 @@ button
     min-height: 0;
 }
 
+.leftContainer
+{
+    overflow: hidden;
+}
+
 .accountItemsContainer
 {
     width: 20rem;
@@ -310,6 +315,12 @@ button
     width: 100%;
     justify-content: space-between;
     align-items: baseline;
+}
+
+.typeName,
+.accountName
+{
+    overflow-wrap: anywhere;
 }
 
 .typeName
@@ -420,7 +431,7 @@ button
 
     .canvasContainer
     {
-        min-height: 450px;
+        max-height: 450px;
     }
 
     .canvasContainer,
