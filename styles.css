@@ -395,7 +395,7 @@ select
 .canvasContainer
 {
     background-color: white;
-    padding-top: 1rem;
+    margin-top: -0.5rem;
 }
 
 .canvasContainer,
@@ -453,14 +453,6 @@ select
     .canvasContainer
     {
         max-height: 450px;
-    }
-
-    .canvasContainer,
-    .transactionsContainer
-    {
-        padding-left: 1rem;
-        padding-right: 1rem;
-        padding-bottom: 1rem;
     }
 }
 
