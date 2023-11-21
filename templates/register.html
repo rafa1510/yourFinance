@@ -1,28 +1,21 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Log In
+    Register
 {% endblock %}
 
 {% block main %}
 
     <div class="loginContainer">
-        <form class="loginForm" action="/login" method="post">
+        <form class="loginForm" action="/register" method="post">
             <div class="credentialsContainer">
                 <input class="credentialsForm" name="username" type="text" placeholder="Username"></input>
                 <input class="credentialsForm" name="password" type="password" placeholder="Password"></input>
             </div>
             <div class="loginButtonContainer">
-                <button class="loginButton" type="submit">Sign In</button>
-                <button class="guestButton">Guest</button>
+                <button class="registerButton" type="submit">Register</button>
             </div>
         </form>
-    </div>
-    <div class="titleContainer">
-        <div class="titleLogoContainer">
-            <h1 class="titleLogo">your</h1>
-            <h1 class="titleLogo">Finance</h1>
-        </div>
     </div>
 
 {% endblock %}

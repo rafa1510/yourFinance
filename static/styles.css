@@ -230,6 +230,7 @@ select
 .credentialsForm,
 .loginButton,
 .guestButton,
+.registerButton,
 .transactionInput
 {
     width: 16.25rem;
@@ -256,27 +257,36 @@ select
 }
 
 .loginButton,
-.guestButton
+.guestButton,
+.registerButton
 {
     border: 0.5px solid black;
     justify-content: center;
     box-shadow: 2px 2px 0px 0px #000;
 }
 
-.loginButton
+.loginButton,
+.registerButton
 {
     background-color: #78C2AD;
     color: white;
 }
 
-.loginButton:hover
+.loginButton:hover,
+.registerButton:hover
 {
     background-color: #56b399;
 }
 
-.loginButton:active
+.loginButton:active,
+.registerButton:active
 {
     background-color: #F3969A;
+}
+
+.registerButton
+{
+    margin-bottom: 3rem;
 }
 
 .guestButton
