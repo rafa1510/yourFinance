@@ -129,12 +129,10 @@ def register():
         username = request.form.get("username")
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
-        usernameCheck = db.execute("SELECT username FROM users WHERE username = ?", username)
-        print(usernameCheck)
-        if usernameCheck != None and usernameCheck != []:
-            usernameCheck = usernameCheck[0]["username"]
-        if username == usernameCheck:
-            return apology("Username already exists")
+        usernameCheck = db.session.execute(db.select(User.username).where(User.username == username)).scalar()
+        if usernameCheck != None:
+            if username == usernameCheck:
+                return apology("Username already exists")
         elif username == "":
             return apology("Username is blank")
         elif password == "":
@@ -145,7 +143,12 @@ def register():
             return apology("Password does not equal confirmation")
         else:
             hashedPassword = generate_password_hash(password)
-            db.execute ("INSERT INTO users (username, hash) VALUES (?, ?)", username, hashedPassword)
+            user = User(
+                username = username,
+                hash = hashedPassword
+            )
+            db.session.add(user)
+            db.session.commit()
             return redirect("/login")
     else:
         return render_template("register.html")
