@@ -69,6 +69,8 @@ class Transaction(db.Model):
 with app.app_context():
     db.create_all()
 
+# Keep's track if title animation has been loaded
+animationLoaded = []
 
 @app.after_request
 def after_request(response):
@@ -118,7 +120,7 @@ def login():
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
-        return render_template("login.html")
+        return render_template("login.html", animationLoaded = animationLoaded)
     
 @app.route("/register", methods=["GET", "POST"])
 def register():

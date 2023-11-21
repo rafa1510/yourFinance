@@ -18,11 +18,14 @@
             </div>
         </form>
     </div>
+    {% if animationLoaded[0] != "True"%}
     <div class="titleContainer">
         <div class="titleLogoContainer">
             <h1 class="titleLogo">your</h1>
             <h1 class="titleLogo">Finance</h1>
         </div>
     </div>
+    {% set temp = animationLoaded.append("True") %}
+    {% endif %}
 
 {% endblock %}

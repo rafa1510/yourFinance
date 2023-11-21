@@ -1,13 +1,3 @@
-// Logo slide in animation
-
-/*
-const title = document.querySelector(".titleContainer")
-
-title.addEventListener("animationend", () => {
-    title.setAttribute("style", "display: none");
-})
-*/
-
 // Mobile menu interactivity
 function toggleMenu()
 {
