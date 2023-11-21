@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/styles.css">
+    <script defer src="static/script.js"></script>
+    <!-- Load script for Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <!-- Import Roboto font from Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    {% if session["user_id"] %}
+    <div class="navbarContainer">
+        <div class="navbarMobileTop">
+            <h2 class="navbarLogo" >yourFinance</h2>
+            <a href="javascript:void(0);" class="menuContainer" onclick="toggleMenu()">
+                <img class="menu" src="static/menu.svg">
+            </a>
+        </div>
+        <ul class="navbarItemsContainer">
+            <a href="templates/home.html" class="navbarItems">Home</a>
+            <a href="templates/transactions.html" class="navbarItems">Transactions</a>
+            <a href="templates/accounts.html" class="navbarItems">Accounts</a>
+            <a href="templates/login.html" class="navbarItems">Log Out</a>
+        </ul>
+    </div>
+    {% else %}
+    <div class="loginNavbarContainer">
+        <div class="navbarMobileTop">
+            <h2 class="navbarLogo" >yourFinance</h2>
+            <a href="javascript:void(0);" class="menuContainer" onclick="toggleLoginMenu()">
+                <img class="menu" src="static/menu.svg">
+            </a>
+        </div>
+        <ul class="navbarItemsContainer">
+            <a href="templates/register.html" class="navbarItems">Register</a>
+            <a href="templates/login.html" class="navbarItems">Log In</a>
+        </ul>
+    </div>
+    {% endif %}
+    {% block main %}{% endblock %}
+</body>
+</html>
