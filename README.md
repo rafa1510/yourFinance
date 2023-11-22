@@ -33,7 +33,7 @@ yourFinance is a personal financial tracker designed to provide a seamless and u
 
 yourFinance is designed to be responsive, providing an optimal user experience across various devices.
 
-![Mobile & Desktop View](static/responsiveDesign.png)
+![Mobile & Desktop View](static/responsiveDesign.svg)
 
 
 ## Usage
