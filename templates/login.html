@@ -11,10 +11,11 @@
             <div class="credentialsContainer">
                 <input class="credentialsForm" name="username" type="text" placeholder="Username"></input>
                 <input class="credentialsForm" name="password" type="password" placeholder="Password"></input>
+                <input type="hidden" class="guestForm" name="guestName"></input>
             </div>
             <div class="loginButtonContainer">
                 <button class="loginButton" type="submit">Sign In</button>
-                <button class="guestButton">Guest</button>
+                <button class="guestButton" onclick="guestLogin()">Guest</button>
             </div>
         </form>
     </div>
@@ -28,4 +29,12 @@
     {% set temp = animationLoaded.append("True") %}
     {% endif %}
 
+    <script>
+        const form = document.querySelector(".loginForm");
+        let guestInput = document.querySelector(".guestForm");
+        function guestLogin() {
+            form.submit();
+            guestInput.value = "login";
+        }
+    </script>
 {% endblock %}

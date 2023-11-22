@@ -161,7 +161,12 @@ def login():
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-
+        guest = request.form.get("guestName")
+        if guest == "login":
+            user = db.session.execute(db.select(User).where(User.username == "guest")).scalar()
+            session["user_id"] = user.id
+            return redirect("/")
+        
         # Ensure username was submitted
         if not request.form.get("username"):
             return apology("Must provide username")
