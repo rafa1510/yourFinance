@@ -35,15 +35,15 @@ yourFinance is designed to be responsive, providing an optimal user experience a
 
 ### Mobile View
 
-![Mobile View](screenshots/mobile.png)
+![Mobile View](static/mobile.png)
 
 ### Normal Screen
 
-![Desktop View](screenshots/desktop.png)
+![Desktop View](static/desktop.png)
 
 ### Wide Screen
 
-![Wide View](screenshots/widescreen.png)
+![Wide View](static/widescreen.png)
 
 
 ## Usage
