@@ -102,7 +102,7 @@ def index():
     # Get transaction information
     accountIDs = db.session.execute(db.select(Account.id).where(Account.user_id == userID)).scalars().all()
     transactions = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(accountIDs)).order_by(Transaction.id.asc())).scalars().all()
-    transactionsTable = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(accountIDs)).limit(10).order_by(Transaction.id.desc())).scalars().all()
+    transactionsTable = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(accountIDs)).limit(7).order_by(Transaction.id.desc())).scalars().all()
 
     # Get month to month data
     monthTotals = []
