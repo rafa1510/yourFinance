@@ -229,8 +229,11 @@ def accounts():
 @app.route("/addAccount", methods=["GET", "POST"])
 @login_required
 def addAccount():
+    userID = session["user_id"]
     # Add account for user
     if request.method == "POST":
+        if userID == 1:
+            return apology("Guests can't modify transactions or accounts")
         userID = session["user_id"]
         name = request.form.get("name")
         if name == "":
@@ -262,6 +265,8 @@ def addTransaction():
     # Add transaction to account
     userID = session["user_id"]
     if request.method == "POST":
+        if userID == 1:
+            return apology("Guests can't modify transactions or accounts")
         transactionType = request.form.get("type")
         dateTime = datetime.datetime.now()
         dateTime = dateTime.strftime("%x")
@@ -319,6 +324,8 @@ def addTransaction():
 def transfer():
     userID = session["user_id"]
     if request.method == "POST":
+        if userID == 1:
+            return apology("Guests can't modify transactions or accounts")
         dateTime = datetime.datetime.now()
         dateTime = dateTime.strftime("%x")
         dateTime = dateTime[:-3]
@@ -369,6 +376,8 @@ def transfer():
 def editAccount():
     userID = session["user_id"]
     if request.method == "POST":
+        if userID == 1:
+            return apology("Guests can't modify transactions or accounts")
         accountID = request.form.get("accountID")
         account = db.session.execute(db.select(Account).where(Account.id == accountID)).scalar()
         name = request.form.get("name")
@@ -389,6 +398,8 @@ def editAccount():
 def deleteAccount():
     userID = session["user_id"]
     if request.method == "POST":
+        if userID == 1:
+            return apology("Guests can't modify transactions or accounts")
         accountID = request.form.get("accountID")
         account = db.session.execute(db.select(Account).where(Account.id == accountID)).scalar()
         # Delete transactions for account
@@ -404,6 +415,8 @@ def deleteAccount():
 def editTransaction():
     userID = session["user_id"]
     if request.method == "POST":
+        if userID == 1:
+            return apology("Guests can't modify transactions or accounts")
         transactionID = request.form.get("transactionID")
         transaction = db.session.execute(db.select(Transaction).where(Transaction.id == transactionID)).scalar()
         name = request.form.get("name")
@@ -424,16 +437,20 @@ def editTransaction():
 @app.route("/deleteTransaction", methods=["POST"])
 @login_required
 def deleteTransaction():
-    transactionID = request.form.get("transactionID")
-    transaction = db.session.execute(db.select(Transaction).where(Transaction.id == transactionID)).scalar()
-    # Find account
-    account = db.session.execute(db.select(Account).where(Account.id == transaction.account_id)).scalar()
-    if transaction.transactionType == "Expense":
-        account.balance += transaction.amount
-    else:
-        if account.balance < transaction.amount:
-            return apology("If you delete this transaction the account balance will be negative")
-        account.balance -= transaction.amount
-    db.session.delete(transaction)
-    db.session.commit()
-    return redirect("/")
+    if request.method == "POST":
+        userID = session["user_id"]
+        if userID == 1:
+            return apology("Guests can't modify transactions or accounts")
+        transactionID = request.form.get("transactionID")
+        transaction = db.session.execute(db.select(Transaction).where(Transaction.id == transactionID)).scalar()
+        # Find account
+        account = db.session.execute(db.select(Account).where(Account.id == transaction.account_id)).scalar()
+        if transaction.transactionType == "Expense":
+            account.balance += transaction.amount
+        else:
+            if account.balance < transaction.amount:
+                return apology("If you delete this transaction the account balance will be negative")
+            account.balance -= transaction.amount
+        db.session.delete(transaction)
+        db.session.commit()
+        return redirect("/")
