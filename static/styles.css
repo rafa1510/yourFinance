@@ -35,6 +35,11 @@ select
     outline: none;
 }
 
+select
+{
+    color: black;
+}
+
 ::placeholder
 {
     color: black;
