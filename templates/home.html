@@ -193,7 +193,7 @@
             labels: [{% for month in monthTotals %}"{{ month.Month }}",{% endfor %}],
             datasets: [{
             label: 'Net Worth',
-            data: [ {% for month in monthTotals %}{{ month.Income - month.Expenses }},{% endfor %}],
+            data: [ {% for month in monthTotals %}{{ month.Balance }},{% endfor %}],
             backgroundColor: [
                 'rgba(255, 26, 104, 0.2)',
                 'rgba(54, 162, 235, 0.2)',

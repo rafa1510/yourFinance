@@ -101,41 +101,55 @@ def index():
     
     # Get transaction information
     accountIDs = db.session.execute(db.select(Account.id).where(Account.user_id == userID)).scalars().all()
-    transactions = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(accountIDs)).order_by(Transaction.id.desc())).scalars().all()
+    transactions = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(accountIDs)).order_by(Transaction.id.asc())).scalars().all()
+    transactionsTable = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(accountIDs)).limit(10).order_by(Transaction.id.desc())).scalars().all()
 
     # Get month to month data
     monthTotals = []
+    balance = 0
     for transaction in transactions:
         monthExists = False
         monthNumber = int(transaction.date[:-3])
         monthName = calendar.month_name[monthNumber]
-        # Check if month exists in list already
         for month in monthTotals:
-            # If it exists then update values
+            # Check if month exists in list already
             if month["Month"] == monthName:
                 monthExists = True
+        # If it exists then update values
         if monthExists == True:
             if transaction.transactionType == "Expense":
-                month["Expenses"] += int(transaction.amount)
-            else:
-                month["Income"] += int(transaction.amount)
-        # If it doesnt exist then append dictionary for month
+                expenses = month["Expenses"] + int(transaction.amount)
+                balance -= int(transaction.amount)
+                month["Expenses"] = expenses
+                month["Balance"] = balance
+            elif transaction.transactionType == "Income":
+                income = month["Income"] + int(transaction.amount)
+                balance += int(transaction.amount)
+                month["Income"] = income
+                month["Balance"] = balance
         else:
             if transaction.transactionType == "Expense":
+                balance -= int(transaction.amount)
                 transactionDict = {
+                "monthNumber": monthNumber,
                 "Month": monthName,
                 "Expenses": int(transaction.amount),
-                "Income": 0
+                "Income": 0,
+                "Balance": balance
                 }
                 monthTotals.append(transactionDict)
             elif transaction.transactionType == "Income":
+                balance += int(transaction.amount)
                 transactionDict = {
+                "monthNumber": monthNumber,
                 "Month": monthName,
                 "Expenses": 0,
-                "Income": int(transaction.amount)
+                "Income": int(transaction.amount),
+                "Balance": balance
                 }
                 monthTotals.append(transactionDict)
-    return render_template("home.html", accounts = accounts, checkingTotal = checkingTotal, savingsTotal = savingsTotal, transactions = transactions, monthTotals = monthTotals)
+
+    return render_template("home.html", accounts = accounts, checkingTotal = checkingTotal, savingsTotal = savingsTotal, transactions = transactionsTable, monthTotals = monthTotals)
 
 
 @app.route("/login", methods=["GET", "POST"])
