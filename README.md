@@ -48,4 +48,4 @@ yourFinance is designed to be responsive, providing an optimal user experience a
 
 ## Usage
 
-Visit [yourFinance.com](rafa1510.pythonanywhere.com) to access the live version of the application. Create an account or log in as a guest, and explore the user-friendly interface for expense & income tracking. Add or delete transactions as needed. Tip: Click an account or transaction in their respective page to edit it!
+Visit [yourFinance.com](https://rafa1510.pythonanywhere.com) to access the live version of the application. Create an account or log in as a guest, and explore the user-friendly interface for expense & income tracking. Add or delete transactions as needed. Tip: Click an account or transaction in their respective page to edit it!
