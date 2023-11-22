@@ -437,12 +437,3 @@ def deleteTransaction():
     db.session.delete(transaction)
     db.session.commit()
     return redirect("/")
-"""
-def transactionSetup {
-    date = "1/01"
-    name = "Grocery Shopping"
-    category = "Food"
-    Account = "Chase Personal"
-
-}
-"""

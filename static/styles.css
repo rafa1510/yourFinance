@@ -608,12 +608,12 @@ button:active
 
     .transactionName
     {
-        width: 35%;
+        width: 30%;
     }
 
     .transactionCategory
     {
-        width: 25%;
+        width: 20%;
     }
 
     .transactionAccount
@@ -623,7 +623,7 @@ button:active
 
     .transactionAmount
     {
-        width: 10%;
+        width: 20%;
     }
 }
 
@@ -742,4 +742,11 @@ button:active
 .transactionRowEdit
 {
     cursor: pointer;
+}
+
+.transactionRowEdit:hover,
+.editForm:hover,
+.transactionsTable tbody .transactionRowEdit:nth-child(odd):hover
+{
+    background-color: #f1f0f0; 
 }
