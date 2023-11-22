@@ -28,10 +28,15 @@
                     </div>
                     {% for account in accounts %}
                         {% if account.category == "Checking" %}
-                            <div class="accountItem">
-                                <h2 class="accountName"> {{ account.name }}</h2>
-                                <h2 class="accountTotal">{{ account.balance | usd }}</h2>
-                            </div>
+                            <form class="editForm" action="/editAccount" method="get">
+                                <div class="accountItem">
+                                    <a onclick="submitForm()" class="editContainer">
+                                        <h2 class="accountName"> {{ account.name }}</h2>
+                                        <h2 class="accountTotal">{{ account.balance | usd }}</h2>
+                                        <input type="hidden" name="accountID" value={{ account.id }}>
+                                    </a>
+                                </div>
+                            </form>
                         {% endif %}
                     {% endfor %}
                 </div>
@@ -42,15 +47,28 @@
                     </div>
                     {% for account in accounts %}
                         {% if account.category == "Savings" %}
-                        <div class="accountItem">
-                            <h2 class="accountName"> {{ account.name }}</h2>
-                            <h2 class="accountTotal">{{ account.balance | usd }}</h2>
-                        </div>
+                        <form class="editForm" action="/editAccount" method="get">
+                            <div class="accountItem">
+                                <a onclick="submitForm()" class="editContainer">
+                                    <h2 class="accountName"> {{ account.name }}</h2>
+                                    <h2 class="accountTotal">{{ account.balance | usd }}</h2>
+                                    <input type="hidden" name="accountID" value={{ account.id }}>
+                                </a>
+                            </div>
+                        </form>
                         {% endif %}
                     {% endfor %}
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        const form = document.querySelector(".editForm");
+        function submitForm()
+        {
+            form.submit();
+        }
+    </script>
 
 {% endblock %}

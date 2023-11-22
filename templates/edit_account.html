@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Edit Account
+{% endblock %}
+
+{% block main %}
+
+    <div class="contentContainer">
+        <div class="accountsContainer">
+            <div class="addTransactionContainer">
+                <div class="addAccountsContainer">
+                    <h2 class="chartTitle">Edit Account</h2>
+                    <div class="chartButtonContainer">
+                        <form action="/deleteAccount" method="post" class="deleteForm">
+                            <input type="hidden" name="accountID" value={{ accountID }}>
+                            <button class="transactionButton" onclick="deleteConfirmation()" type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M1.5 4L18.5 4" stroke="black" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M3.5 5V17.3981C3.5 17.86 3.6994 18.2995 4.04704 18.6037V18.6037C4.33905 18.8592 4.71387 19 5.10188 19H14.8981C15.2861 19 15.661 18.8592 15.953 18.6037V18.6037C16.3006 18.2995 16.5 17.86 16.5 17.3981V5" stroke="black" stroke-width="2"/>
+                                    <line x1="7" y1="7" x2="7" y2="15" stroke="black" stroke-width="1.5"/>
+                                    <line x1="10" y1="7" x2="10" y2="15" stroke="black" stroke-width="1.5"/>
+                                    <line x1="13" y1="7" x2="13" y2="15" stroke="black" stroke-width="1.5"/>
+                                    <path d="M5.5 4V3.2937C5.5 3.10195 5.55513 2.91424 5.65882 2.75294L6.49049 1.45924C6.67449 1.17302 6.9914 1 7.33167 1H12.6683C13.0086 1 13.3255 1.17302 13.5095 1.45924L14.3412 2.75294C14.4449 2.91424 14.5 3.10195 14.5 3.2937V4" stroke="black" stroke-width="2"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <form action="/editAccount" method="post" class="addTransactionForm">
+                    <div class="transactionFormRow">
+                        <h3 class="transactionSubtitle">Name</h3>
+                        <input class="transactionInput" type="text" name="name"></input>
+                        <input type="hidden" name="accountID" value={{ accountID }}>
+                    </div>
+                    <div class="transactionFormRow">
+                        <h3 class="transactionSubtitle">Category</h3>
+                        <select class="transactionInput" name="category">
+                            <option value="Checking">Checking</option>
+                            <option value="Savings">Savings</option>
+                        </select>
+                    </div>
+                    <button class="loginButton" type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const deleteForm = document.querySelector(".deleteForm")
+
+        function deleteConfirmation() {
+            const response = confirm("Are you sure you want to delete the account? If you do, all transactions for that account will be deleted as well.")
+            if (response == true) {
+                deleteForm.submit()
+            } else {
+                return
+            }
+        }
+    </script>
+
+{% endblock %}

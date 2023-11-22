@@ -363,6 +363,42 @@ def transfer():
         accounts = db.session.execute(db.select(Account).where(Account.user_id == userID)).scalars().all()
         return render_template("transfer.html", accounts = accounts)
 
+
+@app.route("/editAccount", methods=["GET", "POST"])
+@login_required
+def editAccount():
+    userID = session["user_id"]
+    if request.method == "POST":
+        accountID = request.form.get("accountID")
+        account = db.session.execute(db.select(Account).where(Account.id == accountID)).scalar()
+        name = request.form.get("name")
+        if name == "":
+            return apology("Name is blank")
+        category = request.form.get("category")
+        account.name = name
+        account.category = category
+        db.session.commit()
+        return redirect("/")
+    else:
+        accountID = request.args.get("accountID")
+        return render_template("edit_account.html",accountID = accountID)
+
+
+@app.route("/deleteAccount", methods=["POST"])
+@login_required
+def deleteAccount():
+    userID = session["user_id"]
+    if request.method == "POST":
+        accountID = request.form.get("accountID")
+        account = db.session.execute(db.select(Account).where(Account.id == accountID)).scalar()
+        # Delete transactions for account
+        transactions = db.session.execute(db.select(Transaction).where(Transaction.account_id == accountID)).scalars().all()
+        for transaction in transactions:
+            db.session.delete(transaction)
+        db.session.delete(account)
+        db.session.commit()
+        return redirect("/")
+
 """
 def transactionSetup {
     date = "1/01"
