@@ -50,7 +50,7 @@
         const deleteForm = document.querySelector(".deleteForm")
 
         function deleteConfirmation() {
-            const response = confirm("Are you sure you want to delete the account? If you do, all transactions for that account will be deleted as well.")
+            const response = confirm("Are you sure you want to delete this account? If you do, all transactions for the account will be deleted as well.")
             if (response == true) {
                 deleteForm.submit()
             } else {

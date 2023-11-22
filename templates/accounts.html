@@ -28,9 +28,9 @@
                     </div>
                     {% for account in accounts %}
                         {% if account.category == "Checking" %}
-                            <form class="editForm" action="/editAccount" method="get">
+                            <form class="editForm" action="/editAccount" method="get" id = {{ account.id }}>
                                 <div class="accountItem">
-                                    <a onclick="submitForm()" class="editContainer">
+                                    <a onclick="document.getElementById( '{{ account.id }}' ).submit();"  class="editContainer">
                                         <h2 class="accountName"> {{ account.name }}</h2>
                                         <h2 class="accountTotal">{{ account.balance | usd }}</h2>
                                         <input type="hidden" name="accountID" value={{ account.id }}>
@@ -47,9 +47,9 @@
                     </div>
                     {% for account in accounts %}
                         {% if account.category == "Savings" %}
-                        <form class="editForm" action="/editAccount" method="get">
+                        <form class="editForm" action="/editAccount" method="get" id = {{ account.id }}>
                             <div class="accountItem">
-                                <a onclick="submitForm()" class="editContainer">
+                                <a href="#" onclick="document.getElementById( '{{ account.id }}' ).submit();" class="editContainer">
                                     <h2 class="accountName"> {{ account.name }}</h2>
                                     <h2 class="accountTotal">{{ account.balance | usd }}</h2>
                                     <input type="hidden" name="accountID" value={{ account.id }}>
@@ -62,13 +62,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        const form = document.querySelector(".editForm");
-        function submitForm()
-        {
-            form.submit();
-        }
-    </script>
 
 {% endblock %}

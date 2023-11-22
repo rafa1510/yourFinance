@@ -45,17 +45,20 @@
                             </thead>
                             <tbody>
                                 {% for transaction in transactions %}
-                                <tr class="transactionRow">
-                                    <td class="transactionDate">{{ transaction.date }}</td>
-                                    <td class="transactionName">{{ transaction.name }}</td>
-                                    <td class="transactionCategory">{{ transaction.category }}</td>
-                                    <td class="transactionAccount">{{ transaction.accountName }}</td>
-                                    {% if transaction.type == "Income" %}
-                                    <td class="transactionAmount">+ {{ transaction.amount | usd }}</td>
-                                    {% else %}
-                                    <td class="transactionAmount">{{ transaction.amount | usd }}</td>
-                                    {% endif %}
-                                </tr>
+                                <form class="editForm" action="/editTransaction" method="get" id = {{ transaction.id }}>
+                                    <input type="hidden" name="transactionID" value={{ transaction.id }}>
+                                    <tr class="transactionRowEdit" onclick="document.getElementById( '{{ transaction.id }}' ).submit();">
+                                        <td class="transactionDate">{{ transaction.date }}</td>
+                                        <td class="transactionName">{{ transaction.name }}</td>
+                                        <td class="transactionCategory">{{ transaction.category }}</td>
+                                        <td class="transactionAccount">{{ transaction.accountName }}</td>
+                                        {% if transaction.type == "Income" %}
+                                        <td class="transactionAmount">+ {{ transaction.amount | usd }}</td>
+                                        {% else %}
+                                        <td class="transactionAmount">{{ transaction.amount | usd }}</td>
+                                        {% endif %}
+                                    </tr>
+                                </form>
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -64,5 +67,4 @@
             </div>
         </div>
     </div>
-
 {% endblock %}

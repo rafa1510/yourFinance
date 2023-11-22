@@ -552,6 +552,7 @@ button:active
 }
 
 .transactionRow,
+.transactionRowEdit,
 .transactionHeader
 {
     display: flex;
@@ -559,7 +560,8 @@ button:active
 }
 
 .transactionHeader th,
-.transactionRow td
+.transactionRow td,
+.transactionRowEdit td
 {
     display: flex;
     justify-content: baseline;
@@ -729,4 +731,15 @@ button:active
     padding: 0;
     margin: 0;
     flex-wrap: nowrap;
+}
+
+.transactionEdit
+{
+    cursor: pointer;
+    width: 100%;
+}
+
+.transactionRowEdit
+{
+    cursor: pointer;
 }

@@ -399,6 +399,44 @@ def deleteAccount():
         db.session.commit()
         return redirect("/")
 
+@app.route("/editTransaction", methods=["GET", "POST"])
+@login_required
+def editTransaction():
+    userID = session["user_id"]
+    if request.method == "POST":
+        transactionID = request.form.get("transactionID")
+        transaction = db.session.execute(db.select(Transaction).where(Transaction.id == transactionID)).scalar()
+        name = request.form.get("name")
+        category = request.form.get("category")
+        if name == "":
+            return apology("Name is blank")
+        if category == "":
+            return apology("Category is blank")
+        transaction.name = name
+        transaction.category = category
+        db.session.commit()
+        return redirect("/")
+    else:
+        transactionID = request.args.get("transactionID")
+        accounts = db.session.execute(db.select(Account).where(Account.user_id == userID)).scalars().all()
+        return render_template("edit_transaction.html", transactionID = transactionID, accounts = accounts)
+
+@app.route("/deleteTransaction", methods=["POST"])
+@login_required
+def deleteTransaction():
+    transactionID = request.form.get("transactionID")
+    transaction = db.session.execute(db.select(Transaction).where(Transaction.id == transactionID)).scalar()
+    # Find account
+    account = db.session.execute(db.select(Account).where(Account.id == transaction.account_id)).scalar()
+    if transaction.transactionType == "Expense":
+        account.balance += transaction.amount
+    else:
+        if account.balance < transaction.amount:
+            return apology("If you delete this transaction the account balance will be negative")
+        account.balance -= transaction.amount
+    db.session.delete(transaction)
+    db.session.commit()
+    return redirect("/")
 """
 def transactionSetup {
     date = "1/01"
