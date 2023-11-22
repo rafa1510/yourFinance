@@ -49,6 +49,7 @@ class Account(db.Model):
 
     category:Mapped[str] = mapped_column(nullable=False)
     name:Mapped[str] = mapped_column(nullable=False)
+    balance:Mapped[int] = mapped_column(nullable=False)
 
     user:Mapped["User"] = relationship(back_populates="accounts")
     transactions:Mapped[List["Transaction"]] = relationship(back_populates="account")
@@ -60,7 +61,7 @@ class Transaction(db.Model):
     date:Mapped[str] = mapped_column(nullable=False)
     name:Mapped[str] = mapped_column(nullable=False)
     category:Mapped[str] = mapped_column(nullable=False)
-    account:Mapped[str] = mapped_column(nullable=False)
+    accountName:Mapped[str] = mapped_column(nullable=False)
     amount:Mapped[int] = mapped_column(nullable=False)
 
     account:Mapped["Account"] = relationship(back_populates="transactions")
@@ -71,6 +72,7 @@ with app.app_context():
 
 # Keep's track if title animation has been loaded
 animationLoaded = []
+
 
 @app.after_request
 def after_request(response):
@@ -86,6 +88,8 @@ def after_request(response):
 def index():
     # Show homepage
     return apology("TODO")
+
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -125,7 +129,9 @@ def login():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("login.html", animationLoaded = animationLoaded)
-    
+
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """Register user"""
@@ -156,3 +162,94 @@ def register():
             return redirect("/login")
     else:
         return render_template("register.html")
+
+
+@app.route("/accounts")
+@login_required
+def accounts():
+    userID = session["user_id"]
+    accounts = db.session.execute(db.select(Account).where(Account.user_id == userID)).scalars().all()
+    checkingTotal = 0
+    savingsTotal = 0
+    for account in accounts:
+        if account.category == "Checking":
+            checkingTotal += account.balance
+        else:
+            savingsTotal += account.balance
+    return render_template("accounts.html", accounts=accounts, checkingTotal = checkingTotal, savingsTotal = savingsTotal)
+
+
+@app.route("/addAccount", methods=["GET", "POST"])
+@login_required
+def addAccount():
+    # Add account for user
+    if request.method == "POST":
+        userID = session["user_id"]
+        name = request.form.get("name")
+        category = request.form.get("category")
+        account = Account(
+            user_id = userID,
+            category = category,
+            name = name,
+            balance = 0
+        )
+        db.session.add(account)
+        db.session.commit()
+        return redirect("/")
+    else:
+        return render_template("add_accounts.html")
+
+@app.route("/transactions")
+@login_required
+def transactions():
+    userID = session["user_id"]
+    userAccounts = db.session.execute(db.select(Account.id).where(Account.user_id == userID)).scalars().all()
+    transactions = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(userAccounts))).scalars().all()
+    return render_template("transactions.html", transactions = transactions)
+
+@app.route("/addTransaction", methods=["GET", "POST"])
+@login_required
+def addTransaction():
+    # Add transaction to account
+    userID = session["user_id"]
+    if request.method == "POST":
+        transactionType = request.form.get("type")
+        dateTime = datetime.datetime.now()
+        dateTime = dateTime.strftime("%x")
+        name = request.form.get("name")
+        if name == "":
+            return apology("Name is blank")
+        category = request.form.get("category")
+        if category == "":
+            return apology("Category is blank")
+        accountID = request.form.get("account")
+        accountID = int(accountID)
+        account = db.session.execute(db.select(Account).where(Account.id == accountID)).scalar_one()
+        amount = request.form.get("amount")
+        if amount == "":
+            return apology("Amount is blank")
+        try:
+            amount = float(amount)
+        except ValueError:
+            return apology("Please input a numerical value for the transaction amount")
+        transaction = Transaction(
+            account_id = accountID,
+            date = dateTime,
+            name = name,
+            category = category,
+            accountName = account.name,
+            amount = amount
+        )
+        balance = account.balance
+        if transactionType == "Expense":
+            balance -= amount
+            account.balance = balance
+        else:
+            balance += amount
+            account.balance = balance
+        db.session.add(transaction)
+        db.session.commit()
+        return redirect("/")
+    else:
+        accounts = db.session.execute(db.select(Account).where(Account.user_id == userID)).scalars().all()
+        return render_template("add_transaction.html", accounts = accounts)

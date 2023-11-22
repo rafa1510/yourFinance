@@ -1,62 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <script defer src="script.js"></script>
-    <!-- Load script for Chart.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-    <!-- Import Roboto font from Google -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-    <title>Title</title>
-</head>
-<body>
-    <div class="navbarContainer">
-        <div class="navbarMobileTop">
-            <h2 class="navbarLogo" >yourFinance</h2>
-            <a href="javascript:void(0);" class="menuContainer" onclick="toggleMenu()">
-                <img class="menu" src="menu.svg">
-            </a>
-        </div>
-        <ul class="navbarItemsContainer">
-            <a href="home.html" class="navbarItems">Home</a>
-            <a href="transactions.html" class="navbarItems">Transactions</a>
-            <a href="accounts.html" class="navbarItems">Accounts</a>
-            <a href="login.html" class="navbarItems">Log Out</a>
-        </ul>
-    </div>
+{% extends "layout.html" %}
+
+{% block title %}
+    Add Transaction
+{% endblock %}
+
+{% block main %}
+
     <div class="contentContainer">
         <div class="accountsContainer">
             <div class="addTransactionContainer">
-                <form>
+                <form action="/addTransaction" method="post">
                     <h2 class="chartTitle">Add Transaction</h2>
                     <div class="transactionFormRow">
+                        <h3 class="transactionSubtitle">Type</h3>
+                        <select class="transactionInput" name="type">
+                            <option value="Expense">Expense</option>
+                            <option value="Income">Income</option>
+                        </select>
+                    </div>
+                    <div class="transactionFormRow">
                         <h3 class="transactionSubtitle">Name</h3>
-                        <input type="text" class="transactionInput"></input>
+                        <input class="transactionInput" type="text" name="name"></input>
                     </div>
                     <div class="transactionFormRow">
                         <h3 class="transactionSubtitle">Category</h3>
-                        <input class="transactionInput"></input>
+                        <input class="transactionInput" name="category"></input>
                     </div>
                     <div class="transactionFormRow">
                         <h3 class="transactionSubtitle">Account</h3>
-                        <select class="transactionInput">
-                            <option value="Truist Personal">Truist Personal</option>
-                            <option value="Chase Business">Chase Business</option>
-                            <option value="Truist Savings">Truist Savings</option>
-                            <option value="Chase Savings">Chase Savings</option>
+                        <select class="transactionInput" name="account">
+                            {% for account in accounts %}
+                            <option value={{ account.id }}>{{ account.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="transactionFormRow">
                         <h3 class="transactionSubtitle">Amount</h3>
-                        <input class="transactionInput"></input>
+                        <input class="transactionInput" name="amount"></input>
                     </div>
+                    <button class="loginButton" type="submit">Submit</button>
                 </form>
             </div>
         </div>
     </div>
-</body>
-</html>
+
+{% endblock %}

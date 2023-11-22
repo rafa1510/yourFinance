@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Add Account
+{% endblock %}
+
+{% block main %}
+
+    <div class="contentContainer">
+        <div class="accountsContainer">
+            <div class="addTransactionContainer">
+                <form action="/addAccount" method="post">
+                    <h2 class="chartTitle">Add Account</h2>
+                    <div class="transactionFormRow">
+                        <h3 class="transactionSubtitle">Name</h3>
+                        <input class="transactionInput" type="text" name="name"></input>
+                    </div>
+                    <div class="transactionFormRow">
+                        <h3 class="transactionSubtitle">Category</h3>
+                        <select class="transactionInput" name="category">
+                            <option value="Checking">Checking</option>
+                            <option value="Savings">Savings</option>
+                        </select>
+                    </div>
+                    <button class="loginButton" type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
