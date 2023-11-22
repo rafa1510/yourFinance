@@ -20,6 +20,16 @@
                                     </svg>
                                 </button>
                             </a>
+                            <a href="/transfer">
+                                <button type="button" class="transferButton">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="16" viewBox="0 0 26 16" fill="none">
+                                        <path d="M13 11.5H14.5V8.5H13V11.5ZM4 11.5H13V8.5H4V11.5Z" fill="black"/>
+                                        <path d="M0 10L10 15.7735V4.2265L0 10ZM12 9H9V11H12V9Z" fill="black"/>
+                                        <path d="M13 4.5H11.5V7.5H13V4.5ZM23 7.5C23.8284 7.5 24.5 6.82843 24.5 6C24.5 5.17157 23.8284 4.5 23 4.5V7.5ZM13 7.5H23V4.5H13V7.5Z" fill="black"/>
+                                        <path d="M26 6L16 0.226497L16 11.7735L26 6ZM14 7L17 7V5L14 5V7Z" fill="black"/>
+                                    </svg>
+                                </button>
+                            </a>
                         </div>
                     </div>
                     <div class="transactionsContainer">
@@ -40,7 +50,11 @@
                                     <td class="transactionName">{{ transaction.name }}</td>
                                     <td class="transactionCategory">{{ transaction.category }}</td>
                                     <td class="transactionAccount">{{ transaction.accountName }}</td>
+                                    {% if transaction.type == "Income" %}
+                                    <td class="transactionAmount">+ {{ transaction.amount | usd }}</td>
+                                    {% else %}
                                     <td class="transactionAmount">{{ transaction.amount | usd }}</td>
+                                    {% endif %}
                                 </tr>
                                 {% endfor %}
                             </tbody>

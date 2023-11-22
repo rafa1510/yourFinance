@@ -1,63 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <script defer src="script.js"></script>
-    <!-- Load script for Chart.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-    <!-- Import Roboto font from Google -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
-    <title>Title</title>
-</head>
-<body>
-    <div class="navbarContainer">
-        <div class="navbarMobileTop">
-            <h2 class="navbarLogo" >yourFinance</h2>
-            <a href="javascript:void(0);" class="menuContainer" onclick="toggleMenu()">
-                <img class="menu" src="menu.svg">
-            </a>
-        </div>
-        <ul class="navbarItemsContainer">
-            <a href="home.html" class="navbarItems">Home</a>
-            <a href="transactions.html" class="navbarItems">Transactions</a>
-            <a href="accounts.html" class="navbarItems">Accounts</a>
-            <a href="login.html" class="navbarItems">Log Out</a>
-        </ul>
-    </div>
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block main %}
+
     <div class="contentContainer">
         <div class="accountsContainer">
             <div class="leftContainer">
                 <div class="accountItemsContainer">
                     <div class="typeContainer">
                         <h1 class="typeName">Checking</h1>
-                        <h1 class="typeTotal">$896</h1>
+                        <h1 class="typeTotal">{{ checkingTotal | usd}}</h1>
                     </div>
-                    <div class="accountItem">
-                        <h2 class="accountName">Truist Personal</h2>
-                        <h2 class="accountTotal">$658</h2>
-                    </div>
-                    <div class="accountItem">
-                        <h2 class="accountName">Chase Business</h2>
-                        <h2 class="accountTotal">$242</h2>
-                    </div>
+                    {% for account in accounts %}
+                        {% if account.category == "Checking" %}
+                            <div class="accountItem">
+                                <h2 class="accountName"> {{ account.name }}</h2>
+                                <h2 class="accountTotal">{{ account.balance | usd }}</h2>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
                 <div class="accountItemsContainer">
                     <div class="typeContainer">
                         <h1 class="typeName">Savings</h1>
-                        <h1 class="typeTotal">$12,694</h1>
+                        <h1 class="typeTotal">{{ savingsTotal | usd }}</h1>
                     </div>
-                    <div class="accountItem">
-                        <h2 class="accountName">Truist Savings</h2>
-                        <h2 class="accountTotal">$968</h2>
-                    </div>
-                    <div class="accountItem">
-                        <h2 class="accountName">Chase Savings</h2>
-                        <h2 class="accountTotal">$1,784</h2>
-                    </div>
+                    {% for account in accounts %}
+                        {% if account.category == "Savings" %}
+                        <div class="accountItem">
+                            <h2 class="accountName"> {{ account.name }}</h2>
+                            <h2 class="accountTotal">{{ account.balance | usd }}</h2>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
             <div class="rightContainer">
@@ -84,10 +62,20 @@
                         <div class="canvasTitle">
                             <h2 class="chartTitle">Recent Transactions</h2>
                             <div class="chartButtonContainer">
-                                <a href="add_transaction.html">
+                                <a href="/addTransaction">
                                     <button type="button" class="lineButton">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
                                             <path d="M8 0V16M0 8H16" stroke="black" stroke-width="4"/>
+                                        </svg>
+                                    </button>
+                                </a>
+                                <a href="/transfer">
+                                    <button type="button" class="transferButton">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="16" viewBox="0 0 26 16" fill="none">
+                                            <path d="M13 11.5H14.5V8.5H13V11.5ZM4 11.5H13V8.5H4V11.5Z" fill="black"/>
+                                            <path d="M0 10L10 15.7735V4.2265L0 10ZM12 9H9V11H12V9Z" fill="black"/>
+                                            <path d="M13 4.5H11.5V7.5H13V4.5ZM23 7.5C23.8284 7.5 24.5 6.82843 24.5 6C24.5 5.17157 23.8284 4.5 23 4.5V7.5ZM13 7.5H23V4.5H13V7.5Z" fill="black"/>
+                                            <path d="M26 6L16 0.226497L16 11.7735L26 6ZM14 7L17 7V5L14 5V7Z" fill="black"/>
                                         </svg>
                                     </button>
                                 </a>
@@ -105,13 +93,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="transactionRow">
-                                        <td class="transactionDate">11/05</td>
-                                        <td class="transactionName">Walgreens Redbull</td>
-                                        <td class="transactionCategory">Food</td>
-                                        <td class="transactionAccount">Truist Personal</td>
-                                        <td class="transactionAmount">$3000.43</td>
-                                    </tr>
+                                    {% for transaction in transactions %}
+                                        <tr class="transactionRow">
+                                            <td class="transactionDate">{{ transaction.date }}</td>
+                                            <td class="transactionName">{{ transaction.name }}</td>
+                                            <td class="transactionCategory">{{ transaction.category }}</td>
+                                            <td class="transactionAccount">{{ transaction.accountName }}</td>
+                                            <td class="transactionAmount">{{ transaction.amount | usd }}</td>
+                                        </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -120,5 +110,147 @@
             </div>
         </div>
     </div>
-</body>
-</html>
+
+    <script>
+        // Line and Bar Chart Buttons
+
+        const lineButton = document.querySelector(".lineButton");
+        const barButton = document.querySelector(".barButton");
+
+        // Chart Header Title
+
+        const chartTitle = document.querySelector(".chartTitle")
+
+        // Chart container to add/remove margin
+        const chartContainer = document.querySelector(".canvasContainer")
+
+        // Main functions to create the charts
+
+        function createBarChart() 
+        {
+        // Bar Chart
+        const data = {
+            labels: [{% for month in monthTotals %}"{{ month.Month }}",{% endfor %}
+            ],
+            datasets: [{
+            label: 'Expenses',
+            data: [{% for month in monthTotals %}{{ month.Expenses }},{% endfor %}
+            ],
+            backgroundColor: [
+                'rgba(255, 26, 104, 0.4)'
+            ],
+            borderWidth: 3,
+            borderColor: 'rgba(255, 26, 104, 0.4)',
+            pointStyle: false
+            },
+            {
+            label: 'Income',
+            data: [{% for month in monthTotals %}{{ month.Income }},{% endfor %}
+            ],
+            backgroundColor: [
+                'rgba(75, 192, 192, 0.4)'
+            ],
+            borderWidth: 3,
+            borderColor: 'rgba(75, 192, 192, 0.4)',
+            pointStyle: false
+            }]
+        };
+
+        // config 
+        const config = {
+            type: 'bar',
+            data,
+            options: {
+            
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                display: false
+                }
+            }
+            }
+        };
+
+        // render init block
+        const barChart = new Chart(
+            document.getElementById('myChart'),
+            config
+        );
+
+        // Set up Line Chart Button
+        lineButton.addEventListener("click", () => {
+            chartTitle.textContent = 'Net Worth';
+            barChart.destroy();
+            createLineChart();
+        })  
+        }
+
+        function createLineChart()
+        {
+        // Line Chart
+        const data = {
+            labels: [{% for month in monthTotals %}"{{ month.Month }}",{% endfor %}],
+            datasets: [{
+            label: 'Net Worth',
+            data: [ {% for month in monthTotals %}{{ month.Income - month.Expenses }},{% endfor %}],
+            backgroundColor: [
+                'rgba(255, 26, 104, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+                'rgba(0, 0, 0, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 26, 104, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(0, 0, 0, 1)'
+            ],
+            borderWidth: 3,
+            borderColor: '#6cc3d5',
+            pointStyle: false,
+            pointradius: 15,
+            radius: 15
+            }]
+        };
+
+        // config 
+        const config = {
+            type: 'line',
+            data,
+            options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                display: false
+                }
+            }
+            }
+        };
+
+        // render init block
+        const lineChart = new Chart(
+            document.getElementById('myChart'),
+            config
+        );
+
+        // Set up Bar Chart Button
+        barButton.addEventListener("click", () => {
+            chartTitle.textContent = 'Expenses vs Income';
+            lineChart.destroy();
+            createBarChart();
+        })
+        }
+
+        // Call lineChart on initial page load
+        createLineChart();
+    </script>
+
+{% endblock %}

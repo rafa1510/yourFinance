@@ -1,4 +1,4 @@
-import os
+import os,calendar
 
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
@@ -59,6 +59,7 @@ class Transaction(db.Model):
     account_id:Mapped[int] = mapped_column(ForeignKey("account.id"),nullable=False)
 
     date:Mapped[str] = mapped_column(nullable=False)
+    transactionType:Mapped[str] = mapped_column(nullable=False)
     name:Mapped[str] = mapped_column(nullable=False)
     category:Mapped[str] = mapped_column(nullable=False)
     accountName:Mapped[str] = mapped_column(nullable=False)
@@ -86,9 +87,55 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    # Show homepage
-    return apology("TODO")
+    userID = session["user_id"]
 
+    # Get account information
+    accounts = db.session.execute(db.select(Account).where(Account.user_id == userID)).scalars().all()
+    checkingTotal = 0
+    savingsTotal = 0
+    for account in accounts:
+        if account.category == "Checking":
+            checkingTotal += account.balance
+        else:
+            savingsTotal += account.balance
+    
+    # Get transaction information
+    accountIDs = db.session.execute(db.select(Account.id).where(Account.user_id == userID)).scalars().all()
+    transactions = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(accountIDs)).order_by(Transaction.id.desc())).scalars().all()
+
+    # Get month to month data
+    monthTotals = []
+    for transaction in transactions:
+        monthExists = False
+        monthNumber = int(transaction.date[:-3])
+        monthName = calendar.month_name[monthNumber]
+        # Check if month exists in list already
+        for month in monthTotals:
+            # If it exists then update values
+            if month["Month"] == monthName:
+                monthExists = True
+        if monthExists == True:
+            if transaction.transactionType == "Expense":
+                month["Expenses"] += int(transaction.amount)
+            else:
+                month["Income"] += int(transaction.amount)
+        # If it doesnt exist then append dictionary for month
+        else:
+            if transaction.transactionType == "Expense":
+                transactionDict = {
+                "Month": monthName,
+                "Expenses": int(transaction.amount),
+                "Income": 0
+                }
+                monthTotals.append(transactionDict)
+            elif transaction.transactionType == "Income":
+                transactionDict = {
+                "Month": monthName,
+                "Expenses": 0,
+                "Income": int(transaction.amount)
+                }
+                monthTotals.append(transactionDict)
+    return render_template("home.html", accounts = accounts, checkingTotal = checkingTotal, savingsTotal = savingsTotal, transactions = transactions, monthTotals = monthTotals)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -186,6 +233,8 @@ def addAccount():
     if request.method == "POST":
         userID = session["user_id"]
         name = request.form.get("name")
+        if name == "":
+            return apology("Name is blank")
         category = request.form.get("category")
         account = Account(
             user_id = userID,
@@ -204,7 +253,7 @@ def addAccount():
 def transactions():
     userID = session["user_id"]
     userAccounts = db.session.execute(db.select(Account.id).where(Account.user_id == userID)).scalars().all()
-    transactions = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(userAccounts))).scalars().all()
+    transactions = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(userAccounts)).order_by(Transaction.id.desc())).scalars().all()
     return render_template("transactions.html", transactions = transactions)
 
 @app.route("/addTransaction", methods=["GET", "POST"])
@@ -216,6 +265,7 @@ def addTransaction():
         transactionType = request.form.get("type")
         dateTime = datetime.datetime.now()
         dateTime = dateTime.strftime("%x")
+        dateTime = dateTime[:-3]
         name = request.form.get("name")
         if name == "":
             return apology("Name is blank")
@@ -223,18 +273,26 @@ def addTransaction():
         if category == "":
             return apology("Category is blank")
         accountID = request.form.get("account")
-        accountID = int(accountID)
+        if accountID == None:
+            return apology("Please select an account")
+        try:
+            accountID = int(accountID)
+        except ValueError or TypeError:
+            return apology("Please select an account")
         account = db.session.execute(db.select(Account).where(Account.id == accountID)).scalar_one()
         amount = request.form.get("amount")
-        if amount == "":
+        if amount == "" or None:
             return apology("Amount is blank")
         try:
             amount = float(amount)
-        except ValueError:
+        except ValueError or TypeError:
             return apology("Please input a numerical value for the transaction amount")
+        if amount <= 0:
+            return apology("Please enter a positive amount")
         transaction = Transaction(
             account_id = accountID,
             date = dateTime,
+            transactionType = transactionType,
             name = name,
             category = category,
             accountName = account.name,
@@ -242,6 +300,8 @@ def addTransaction():
         )
         balance = account.balance
         if transactionType == "Expense":
+            if balance < amount:
+                return apology("You do not have enough balance for this transaction")
             balance -= amount
             account.balance = balance
         else:
@@ -253,3 +313,62 @@ def addTransaction():
     else:
         accounts = db.session.execute(db.select(Account).where(Account.user_id == userID)).scalars().all()
         return render_template("add_transaction.html", accounts = accounts)
+
+@app.route("/transfer", methods=["GET", "POST"])
+@login_required
+def transfer():
+    userID = session["user_id"]
+    if request.method == "POST":
+        dateTime = datetime.datetime.now()
+        dateTime = dateTime.strftime("%x")
+        dateTime = dateTime[:-3]
+        fromID = request.form.get("from")
+        toID = request.form.get("to")
+        if fromID == None:
+            return apology("Please enter an account to transfer from")
+        if toID == None:
+            return apology("Please enter an account to transfer to")
+        if fromID == toID:
+            return apology("Can't transfer to the same account")
+        fromID = int(fromID)
+        toID = int(toID)
+        fromAccount = db.session.execute(db.select(Account).where(Account.id == fromID)).scalar_one()
+        toAccount = db.session.execute(db.select(Account).where(Account.id == toID)).scalar_one()
+        amount = request.form.get("amount")
+        if amount == "" or None:
+            return apology("Amount is blank")
+        try:
+            amount = float(amount)
+        except ValueError or TypeError:
+            return apology("Please input a numerical value for the transfer amount")
+        if amount <= 0:
+            return apology("Please enter a positive amount")
+        if fromAccount.balance < amount:
+            return apology("You do not have enough balance for this transfer")
+        fromAccount.balance -= amount
+        toAccount.balance += amount
+        transaction = Transaction(
+            account_id = fromID,
+            date = dateTime,
+            transactionType = "Transfer",
+            name = "Internal Transfer",
+            category = "Transfer",
+            accountName = fromAccount.name,
+            amount = amount
+        )
+        db.session.add(transaction)
+        db.session.commit()
+        return redirect("/")
+    else:
+        accounts = db.session.execute(db.select(Account).where(Account.user_id == userID)).scalars().all()
+        return render_template("transfer.html", accounts = accounts)
+
+"""
+def transactionSetup {
+    date = "1/01"
+    name = "Grocery Shopping"
+    category = "Food"
+    Account = "Chase Personal"
+
+}
+"""

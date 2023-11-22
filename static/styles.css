@@ -306,6 +306,11 @@ select
    color: white; 
 }
 
+button:active
+{
+    background-color: #e6e6e6; 
+}
+
 /* Home */
 
 .accountsContainer
@@ -461,7 +466,8 @@ select
 
 .lineButton,
 .barButton,
-.transactionButton
+.transactionButton,
+.transferButton
 {
     display: flex;
     justify-content: center;
@@ -471,7 +477,8 @@ select
     height: 32px; 
 }
 
-.barButton
+.barButton,
+.transferButton
 {
     border-left: 1px solid black;
 }
