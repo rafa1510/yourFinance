@@ -3,17 +3,7 @@ from functools import wraps
 
 def apology(message):
     """Render message as an apology to user."""
-    def escape(s):
-        """
-        Escape special characters.
-
-        https://github.com/jacebrowning/memegen#special-characters
-        """
-        for old, new in [("-", "--"), (" ", "-"), ("_", "__"), ("?", "~q"),
-                         ("%", "~p"), ("#", "~h"), ("/", "~s"), ("\"", "''")]:
-            s = s.replace(old, new)
-        return s
-    return render_template("apology.html", top="Error", bottom=escape(message))
+    return render_template("apology.html", top="Error", bottom=message)
 
 def login_required(f):
     """

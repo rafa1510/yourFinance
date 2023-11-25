@@ -50,11 +50,37 @@ select
 .apologyContainer
 {
     display: flex;
+    flex-direction: column;
     margin-top: 5rem;
     flex-grow: 1;
     flex-shrink: 1;
     justify-content: center;
     align-items: center;
+}
+
+.errorIcon
+{
+    width: 360px;
+    height: 360px;
+    position:static;
+}
+
+.errorTitle,
+.errorText
+{
+    color: #545454;
+    text-align: center;
+}
+
+.errorTitle
+{
+    font-size: 2.5rem;
+}
+
+.errorText
+{
+    font-size: 1.5rem;
+    font-weight: 400;
 }
 
 /* Title Page */

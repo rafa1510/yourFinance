@@ -6,7 +6,8 @@
 
 {% block main %}
     <div class="apologyContainer">
-        <!-- https://memegen.link/ -->
-        <img alt="{{ top }}" src="http://memegen.link/custom/{{ top | urlencode }}/{{ bottom | urlencode }}.jpg?alt=https://i.imgur.com/oEL0iCC.jpg&width=400" title="{{ top }}">
+        <h1 class="errorTitle">{{ top }}</h1>
+        <img alt="{{ top }}" src="static/error.svg" class="errorIcon">
+        <h2 class="errorText">{{ bottom }}</h2>
     </div>
 {% endblock %}
