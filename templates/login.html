@@ -30,11 +30,11 @@
     {% endif %}
 
     <script>
-        const form = document.querySelector(".loginForm");
+        const FORM = document.querySelector(".loginForm");
         let guestInput = document.querySelector(".guestForm");
         function guestLogin() {
             form.submit();
-            guestInput.value = "login";
+            guestInput.value = "GUEST_LOGIN";
         }
     </script>
 {% endblock %}

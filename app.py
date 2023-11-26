@@ -1,11 +1,8 @@
-import os,calendar
-
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-import datetime
 
-from helpers import apology, login_required, usd
+from helpers import apology, loginRequired, usd, currentDate, checkGuest, getUserAccounts, getAccount, getUserAccountsID, getTransaction, getAccountTransactions, getAccountsTransactions, getMonthTotals, GUEST_ACCOUNT_ID
 from models import db, User, Account, Transaction
 
 # Configure application
@@ -41,12 +38,12 @@ def after_request(response):
 
 
 @app.route("/")
-@login_required
+@loginRequired
 def index():
     userID = session["user_id"]
 
     # Get account information
-    accounts = db.session.execute(db.select(Account).where(Account.user_id == userID)).scalars().all()
+    accounts = getUserAccounts(userID)
     checkingTotal = 0
     savingsTotal = 0
     for account in accounts:
@@ -56,54 +53,10 @@ def index():
             savingsTotal += account.balance
     
     # Get transaction information
-    accountIDs = db.session.execute(db.select(Account.id).where(Account.user_id == userID)).scalars().all()
-    transactions = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(accountIDs)).order_by(Transaction.id.asc())).scalars().all()
-    transactionsTable = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(accountIDs)).limit(5).order_by(Transaction.id.desc())).scalars().all()
+    userAccountsID = getUserAccountsID(userID)
+    transactionsTable = getAccountsTransactions(userAccountsID)
 
-    # Get month to month data
-    monthTotals = []
-    balance = 0
-    for transaction in transactions:
-        monthExists = False
-        monthNumber = int(transaction.date[:-3])
-        monthName = calendar.month_name[monthNumber]
-        for month in monthTotals:
-            # Check if month exists in list already
-            if month["Month"] == monthName:
-                monthExists = True
-        # If it exists then update values
-        if monthExists == True:
-            if transaction.transactionType == "Expense":
-                expenses = month["Expenses"] + int(transaction.amount)
-                balance -= int(transaction.amount)
-                month["Expenses"] = expenses
-                month["Balance"] = balance
-            elif transaction.transactionType == "Income":
-                income = month["Income"] + int(transaction.amount)
-                balance += int(transaction.amount)
-                month["Income"] = income
-                month["Balance"] = balance
-        else:
-            if transaction.transactionType == "Expense":
-                balance -= int(transaction.amount)
-                transactionDict = {
-                "monthNumber": monthNumber,
-                "Month": monthName,
-                "Expenses": int(transaction.amount),
-                "Income": 0,
-                "Balance": balance
-                }
-                monthTotals.append(transactionDict)
-            elif transaction.transactionType == "Income":
-                balance += int(transaction.amount)
-                transactionDict = {
-                "monthNumber": monthNumber,
-                "Month": monthName,
-                "Expenses": 0,
-                "Income": int(transaction.amount),
-                "Balance": balance
-                }
-                monthTotals.append(transactionDict)
+    monthTotals = getMonthTotals(userAccountsID)
 
     return render_template("home.html", accounts = accounts, checkingTotal = checkingTotal, savingsTotal = savingsTotal, transactions = transactionsTable, monthTotals = monthTotals)
 
@@ -117,9 +70,9 @@ def login():
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-        guest = request.form.get("guestName")
-        if guest == "login":
-            user = db.session.execute(db.select(User).where(User.username == "guest")).scalar()
+        checkGuestLogin = request.form.get("guestName")
+        if checkGuestLogin == "GUEST_LOGIN":
+            user = getAccount(GUEST_ACCOUNT_ID)
             session["user_id"] = user.id
             return redirect("/")
         
@@ -187,10 +140,10 @@ def register():
 
 
 @app.route("/accounts")
-@login_required
+@loginRequired
 def accounts():
     userID = session["user_id"]
-    accounts = db.session.execute(db.select(Account).where(Account.user_id == userID)).scalars().all()
+    accounts = getUserAccounts(userID)
     checkingTotal = 0
     savingsTotal = 0
     for account in accounts:
@@ -202,14 +155,13 @@ def accounts():
 
 
 @app.route("/addAccount", methods=["GET", "POST"])
-@login_required
+@loginRequired
 def addAccount():
     userID = session["user_id"]
     # Add account for user
     if request.method == "POST":
-        if userID == 1:
+        if checkGuest(userID):
             return apology("Guests can't modify transactions or accounts")
-        userID = session["user_id"]
         name = request.form.get("name")
         if name == "":
             return apology("Name is blank")
@@ -227,25 +179,23 @@ def addAccount():
         return render_template("add_accounts.html")
 
 @app.route("/transactions")
-@login_required
+@loginRequired
 def transactions():
     userID = session["user_id"]
-    userAccounts = db.session.execute(db.select(Account.id).where(Account.user_id == userID)).scalars().all()
-    transactions = db.session.execute(db.select(Transaction).where(Transaction.account_id.in_(userAccounts)).order_by(Transaction.id.desc())).scalars().all()
+    userAccountsID = getUserAccountsID(userID)
+    transactions = getAccountsTransactions(userAccountsID)
     return render_template("transactions.html", transactions = transactions)
 
 @app.route("/addTransaction", methods=["GET", "POST"])
-@login_required
+@loginRequired
 def addTransaction():
     # Add transaction to account
     userID = session["user_id"]
     if request.method == "POST":
-        if userID == 1:
+        if checkGuest(userID):
             return apology("Guests can't modify transactions or accounts")
         transactionType = request.form.get("type")
-        dateTime = datetime.datetime.now()
-        dateTime = dateTime.strftime("%x")
-        dateTime = dateTime[:-3]
+        dateTime = currentDate()
         name = request.form.get("name")
         if name == "":
             return apology("Name is blank")
@@ -259,7 +209,7 @@ def addTransaction():
             accountID = int(accountID)
         except ValueError or TypeError:
             return apology("Please select an account")
-        account = db.session.execute(db.select(Account).where(Account.id == accountID)).scalar_one()
+        account = getAccount(accountID)
         amount = request.form.get("amount")
         if amount == "" or None:
             return apology("Amount is blank")
@@ -291,19 +241,17 @@ def addTransaction():
         db.session.commit()
         return redirect("/")
     else:
-        accounts = db.session.execute(db.select(Account).where(Account.user_id == userID)).scalars().all()
+        accounts = getUserAccounts(userID)
         return render_template("add_transaction.html", accounts = accounts)
 
 @app.route("/transfer", methods=["GET", "POST"])
-@login_required
+@loginRequired
 def transfer():
     userID = session["user_id"]
     if request.method == "POST":
-        if userID == 1:
+        if checkGuest(userID):
             return apology("Guests can't modify transactions or accounts")
-        dateTime = datetime.datetime.now()
-        dateTime = dateTime.strftime("%x")
-        dateTime = dateTime[:-3]
+        dateTime = currentDate()
         fromID = request.form.get("from")
         toID = request.form.get("to")
         if fromID == None:
@@ -314,8 +262,8 @@ def transfer():
             return apology("Can't transfer to the same account")
         fromID = int(fromID)
         toID = int(toID)
-        fromAccount = db.session.execute(db.select(Account).where(Account.id == fromID)).scalar_one()
-        toAccount = db.session.execute(db.select(Account).where(Account.id == toID)).scalar_one()
+        fromAccount = getAccount(fromID)
+        toAccount = getAccount(toID)
         amount = request.form.get("amount")
         if amount == "" or None:
             return apology("Amount is blank")
@@ -342,19 +290,19 @@ def transfer():
         db.session.commit()
         return redirect("/")
     else:
-        accounts = db.session.execute(db.select(Account).where(Account.user_id == userID)).scalars().all()
+        accounts = getUserAccounts(userID)
         return render_template("transfer.html", accounts = accounts)
 
 
 @app.route("/editAccount", methods=["GET", "POST"])
-@login_required
+@loginRequired
 def editAccount():
     userID = session["user_id"]
     if request.method == "POST":
-        if userID == 1:
+        if checkGuest(userID):
             return apology("Guests can't modify transactions or accounts")
         accountID = request.form.get("accountID")
-        account = db.session.execute(db.select(Account).where(Account.id == accountID)).scalar()
+        account = getAccount(accountID)
         name = request.form.get("name")
         if name == "":
             return apology("Name is blank")
@@ -369,16 +317,16 @@ def editAccount():
 
 
 @app.route("/deleteAccount", methods=["POST"])
-@login_required
+@loginRequired
 def deleteAccount():
     userID = session["user_id"]
     if request.method == "POST":
-        if userID == 1:
+        if checkGuest(userID):
             return apology("Guests can't modify transactions or accounts")
         accountID = request.form.get("accountID")
-        account = db.session.execute(db.select(Account).where(Account.id == accountID)).scalar()
+        account = getAccount(accountID)
         # Delete transactions for account
-        transactions = db.session.execute(db.select(Transaction).where(Transaction.account_id == accountID)).scalars().all()
+        transactions = getAccountTransactions(accountID)
         for transaction in transactions:
             db.session.delete(transaction)
         db.session.delete(account)
@@ -386,14 +334,14 @@ def deleteAccount():
         return redirect("/")
 
 @app.route("/editTransaction", methods=["GET", "POST"])
-@login_required
+@loginRequired
 def editTransaction():
     userID = session["user_id"]
     if request.method == "POST":
-        if userID == 1:
+        if checkGuest(userID):
             return apology("Guests can't modify transactions or accounts")
         transactionID = request.form.get("transactionID")
-        transaction = db.session.execute(db.select(Transaction).where(Transaction.id == transactionID)).scalar()
+        transaction = getTransaction(transactionID)
         name = request.form.get("name")
         category = request.form.get("category")
         if name == "":
@@ -406,20 +354,20 @@ def editTransaction():
         return redirect("/")
     else:
         transactionID = request.args.get("transactionID")
-        accounts = db.session.execute(db.select(Account).where(Account.user_id == userID)).scalars().all()
+        accounts = getUserAccounts(userID)
         return render_template("edit_transaction.html", transactionID = transactionID, accounts = accounts)
 
 @app.route("/deleteTransaction", methods=["POST"])
-@login_required
+@loginRequired
 def deleteTransaction():
     if request.method == "POST":
         userID = session["user_id"]
-        if userID == 1:
+        if checkGuest(userID):
             return apology("Guests can't modify transactions or accounts")
         transactionID = request.form.get("transactionID")
-        transaction = db.session.execute(db.select(Transaction).where(Transaction.id == transactionID)).scalar()
+        transaction = getTransaction(transactionID)
         # Find account
-        account = db.session.execute(db.select(Account).where(Account.id == transaction.account_id)).scalar()
+        account = getAccount(transaction.account_id)
         if transaction.transactionType == "Expense":
             account.balance += transaction.amount
         else:
