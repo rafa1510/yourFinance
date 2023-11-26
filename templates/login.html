@@ -11,7 +11,7 @@
             <div class="credentialsContainer">
                 <input class="credentialsForm" name="username" type="text" placeholder="Username"></input>
                 <input class="credentialsForm" name="password" type="password" placeholder="Password"></input>
-                <input type="hidden" class="guestForm" name="guestName"></input>
+                <input type="hidden" name="guestForm" class="guestForm"></input>
             </div>
             <div class="loginButtonContainer">
                 <button class="loginButton" type="submit">Sign In</button>
@@ -33,7 +33,7 @@
         const FORM = document.querySelector(".loginForm");
         let guestInput = document.querySelector(".guestForm");
         function guestLogin() {
-            form.submit();
+            FORM.submit();
             guestInput.value = "GUEST_LOGIN";
         }
     </script>

@@ -2,7 +2,27 @@ from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, loginRequired, usd, currentDate, checkGuest, getUserAccounts, getAccount, getUserAccountsID, getTransaction, getAccountTransactions, getAccountsTransactions, getMonthTotals, GUEST_ACCOUNT_ID
+from helpers import (
+    GUEST_ACCOUNT_ID,
+    apology,
+    loginRequired,
+    usd,
+    currentDate,
+    checkGuest,
+    getUserByID,
+    getUserAccounts,
+    getAccount,
+    getUserAccountsID,
+    getTransaction,
+    getAccountTransactions,
+    getAccountsTransactions,
+    getMonthTotals,
+    getTypeTotals,
+    isBlank,
+    getUser,
+    isInt,
+    isFloat,
+)
 from models import db, User, Account, Transaction
 
 # Configure application
@@ -28,6 +48,7 @@ with app.app_context():
 # Keep's track if title animation has been loaded
 animationLoaded = []
 
+
 @app.after_request
 def after_request(response):
     """Ensure responses aren't cached"""
@@ -44,51 +65,59 @@ def index():
 
     # Get account information
     accounts = getUserAccounts(userID)
-    checkingTotal = 0
-    savingsTotal = 0
-    for account in accounts:
-        if account.category == "Checking":
-            checkingTotal += account.balance
-        else:
-            savingsTotal += account.balance
-    
+    checkingTotal = getTypeTotals(accounts, "Checking")
+    savingsTotal = getTypeTotals(accounts, "Savings")
+
     # Get transaction information
     userAccountsID = getUserAccountsID(userID)
-    transactionsTable = getAccountsTransactions(userAccountsID)
+    allTransactions = getAccountsTransactions(userAccountsID)
 
     monthTotals = getMonthTotals(userAccountsID)
 
-    return render_template("home.html", accounts = accounts, checkingTotal = checkingTotal, savingsTotal = savingsTotal, transactions = transactionsTable, monthTotals = monthTotals)
+    # Only show latest transactions
+    transactions = []
+    counter = 0
+    for transaction in allTransactions:
+        if counter < 5:
+            transactions.append(transaction)
+            counter += 1
+
+    return render_template(
+        "home.html",
+        accounts=accounts,
+        checkingTotal=checkingTotal,
+        savingsTotal=savingsTotal,
+        transactions=transactions,
+        monthTotals=monthTotals,
+    )
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    """Log user in"""
-
     # Forget any user_id
     session.clear()
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-        checkGuestLogin = request.form.get("guestName")
+        checkGuestLogin = request.form.get("guestForm")
+        print(checkGuestLogin)
         if checkGuestLogin == "GUEST_LOGIN":
-            user = getAccount(GUEST_ACCOUNT_ID)
+            user = getUserByID(GUEST_ACCOUNT_ID)
             session["user_id"] = user.id
             return redirect("/")
-        
-        # Ensure username was submitted
-        if not request.form.get("username"):
-            return apology("Must provide username")
-
-        # Ensure password was submitted
-        elif not request.form.get("password"):
-            return apology("Must provide password")
 
         # Query database for username
         username = request.form.get("username")
         password = request.form.get("password")
-        user = db.session.execute(db.select(User).where(User.username == username)).scalar()
-        if user == None:
+
+        # Ensure inputs are submitted
+        if isBlank(username):
+            return apology("Must provide username")
+        if isBlank(password):
+            return apology("Must provide password")
+
+        user = getUser(username)
+        if isBlank(user):
             return apology("User does not exist")
 
         # Ensure username exists and password is correct
@@ -103,8 +132,7 @@ def login():
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
-        return render_template("login.html", animationLoaded = animationLoaded)
-
+        return render_template("login.html", animationLoaded=animationLoaded)
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -114,24 +142,21 @@ def register():
         username = request.form.get("username")
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
-        usernameCheck = db.session.execute(db.select(User.username).where(User.username == username)).scalar()
-        if usernameCheck != None:
-            if username == usernameCheck:
-                return apology("Username already exists")
-        elif username == "":
-            return apology("Username is blank")
-        elif password == "":
-            return apology("Password is blank")
-        elif confirmation == "":
-            return apology("Confirmation is blank")
+        allUsernames = db.session.execute(db.select(User.username)).scalars().all()
+
+        if username in allUsernames:
+            return apology("User already exists")
+        elif isBlank(username):
+            return apology("Must provide username")
+        elif isBlank(password):
+            return apology("Must provide password")
+        elif isBlank(confirmation):
+            return apology("Must provide a confirmation password")
         elif password != confirmation:
             return apology("Password does not equal confirmation")
         else:
             hashedPassword = generate_password_hash(password)
-            user = User(
-                username = username,
-                hash = hashedPassword
-            )
+            user = User(username=username, hash=hashedPassword)
             db.session.add(user)
             db.session.commit()
             return redirect("/login")
@@ -144,14 +169,15 @@ def register():
 def accounts():
     userID = session["user_id"]
     accounts = getUserAccounts(userID)
-    checkingTotal = 0
-    savingsTotal = 0
-    for account in accounts:
-        if account.category == "Checking":
-            checkingTotal += account.balance
-        else:
-            savingsTotal += account.balance
-    return render_template("accounts.html", accounts=accounts, checkingTotal = checkingTotal, savingsTotal = savingsTotal)
+    checkingTotal = getTypeTotals(accounts, "Checking")
+    savingsTotal = getTypeTotals(accounts, "Savings")
+
+    return render_template(
+        "accounts.html",
+        accounts=accounts,
+        checkingTotal=checkingTotal,
+        savingsTotal=savingsTotal,
+    )
 
 
 @app.route("/addAccount", methods=["GET", "POST"])
@@ -162,21 +188,19 @@ def addAccount():
     if request.method == "POST":
         if checkGuest(userID):
             return apology("Guests can't modify transactions or accounts")
+
         name = request.form.get("name")
-        if name == "":
-            return apology("Name is blank")
-        category = request.form.get("category")
-        account = Account(
-            user_id = userID,
-            category = category,
-            name = name,
-            balance = 0
-        )
+
+        if isBlank(name):
+            return apology("Must provide a name")
+
+        account = Account(user_id=userID, category=category, name=name, balance=0)
         db.session.add(account)
         db.session.commit()
         return redirect("/")
     else:
         return render_template("add_accounts.html")
+
 
 @app.route("/transactions")
 @loginRequired
@@ -184,7 +208,8 @@ def transactions():
     userID = session["user_id"]
     userAccountsID = getUserAccountsID(userID)
     transactions = getAccountsTransactions(userAccountsID)
-    return render_template("transactions.html", transactions = transactions)
+    return render_template("transactions.html", transactions=transactions)
+
 
 @app.route("/addTransaction", methods=["GET", "POST"])
 @loginRequired
@@ -194,39 +219,39 @@ def addTransaction():
     if request.method == "POST":
         if checkGuest(userID):
             return apology("Guests can't modify transactions or accounts")
-        transactionType = request.form.get("type")
+
         dateTime = currentDate()
+        transactionType = request.form.get("type")
         name = request.form.get("name")
-        if name == "":
-            return apology("Name is blank")
         category = request.form.get("category")
-        if category == "":
-            return apology("Category is blank")
         accountID = request.form.get("account")
-        if accountID == None:
-            return apology("Please select an account")
-        try:
-            accountID = int(accountID)
-        except ValueError or TypeError:
-            return apology("Please select an account")
-        account = getAccount(accountID)
         amount = request.form.get("amount")
-        if amount == "" or None:
-            return apology("Amount is blank")
-        try:
-            amount = float(amount)
-        except ValueError or TypeError:
-            return apology("Please input a numerical value for the transaction amount")
+
+        if isBlank(name):
+            return apology("Must provide a name")
+        if isBlank(category):
+            return apology("Must provide a category")
+        if isBlank(amount):
+            return apology("Please input an amount")
+
+        if not isFloat(amount):
+            return apology("Please input a number for the transaction amount")
+
+        accountID = int(accountID)
+        amount = float(amount)
+        account = getAccount(accountID)
+
         if amount <= 0:
-            return apology("Please enter a positive amount")
+            return apology("Please input a positive amount")
+
         transaction = Transaction(
-            account_id = accountID,
-            date = dateTime,
-            transactionType = transactionType,
-            name = name,
-            category = category,
-            accountName = account.name,
-            amount = amount
+            account_id=accountID,
+            date=dateTime,
+            transactionType=transactionType,
+            name=name,
+            category=category,
+            accountName=account.name,
+            amount=amount,
         )
         balance = account.balance
         if transactionType == "Expense":
@@ -242,7 +267,8 @@ def addTransaction():
         return redirect("/")
     else:
         accounts = getUserAccounts(userID)
-        return render_template("add_transaction.html", accounts = accounts)
+        return render_template("add_transaction.html", accounts=accounts)
+
 
 @app.route("/transfer", methods=["GET", "POST"])
 @loginRequired
@@ -254,44 +280,44 @@ def transfer():
         dateTime = currentDate()
         fromID = request.form.get("from")
         toID = request.form.get("to")
-        if fromID == None:
-            return apology("Please enter an account to transfer from")
-        if toID == None:
-            return apology("Please enter an account to transfer to")
+        amount = request.form.get("amount")
+
+        if isBlank(amount):
+            return apology("Please input an amount")
         if fromID == toID:
             return apology("Can't transfer to the same account")
+
+        if not isFloat(amount):
+            return apology("Please input a number for the transfer amount")
+
         fromID = int(fromID)
         toID = int(toID)
+
         fromAccount = getAccount(fromID)
         toAccount = getAccount(toID)
-        amount = request.form.get("amount")
-        if amount == "" or None:
-            return apology("Amount is blank")
-        try:
-            amount = float(amount)
-        except ValueError or TypeError:
-            return apology("Please input a numerical value for the transfer amount")
+
         if amount <= 0:
-            return apology("Please enter a positive amount")
+            return apology("Please input a positive amount")
         if fromAccount.balance < amount:
             return apology("You do not have enough balance for this transfer")
+
         fromAccount.balance -= amount
         toAccount.balance += amount
         transaction = Transaction(
-            account_id = fromID,
-            date = dateTime,
-            transactionType = "Transfer",
-            name = "Internal Transfer",
-            category = "Transfer",
-            accountName = fromAccount.name,
-            amount = amount
+            account_id=fromID,
+            date=dateTime,
+            transactionType="Transfer",
+            name="Internal Transfer",
+            category="Transfer",
+            accountName=fromAccount.name,
+            amount=amount,
         )
         db.session.add(transaction)
         db.session.commit()
         return redirect("/")
     else:
         accounts = getUserAccounts(userID)
-        return render_template("transfer.html", accounts = accounts)
+        return render_template("transfer.html", accounts=accounts)
 
 
 @app.route("/editAccount", methods=["GET", "POST"])
@@ -302,18 +328,20 @@ def editAccount():
         if checkGuest(userID):
             return apology("Guests can't modify transactions or accounts")
         accountID = request.form.get("accountID")
-        account = getAccount(accountID)
         name = request.form.get("name")
-        if name == "":
-            return apology("Name is blank")
         category = request.form.get("category")
+        account = getAccount(accountID)
+
+        if isBlank(name):
+            return apology("Please input a name")
+
         account.name = name
         account.category = category
         db.session.commit()
         return redirect("/")
     else:
         accountID = request.args.get("accountID")
-        return render_template("edit_account.html",accountID = accountID)
+        return render_template("edit_account.html", accountID=accountID)
 
 
 @app.route("/deleteAccount", methods=["POST"])
@@ -333,6 +361,7 @@ def deleteAccount():
         db.session.commit()
         return redirect("/")
 
+
 @app.route("/editTransaction", methods=["GET", "POST"])
 @loginRequired
 def editTransaction():
@@ -340,14 +369,14 @@ def editTransaction():
     if request.method == "POST":
         if checkGuest(userID):
             return apology("Guests can't modify transactions or accounts")
-        transactionID = request.form.get("transactionID")
         transaction = getTransaction(transactionID)
+        transactionID = request.form.get("transactionID")
         name = request.form.get("name")
         category = request.form.get("category")
-        if name == "":
-            return apology("Name is blank")
-        if category == "":
-            return apology("Category is blank")
+        if isBlank(name):
+            return apology("Please input a name")
+        if isBlank(category):
+            return apology("Please input a category")
         transaction.name = name
         transaction.category = category
         db.session.commit()
@@ -355,7 +384,10 @@ def editTransaction():
     else:
         transactionID = request.args.get("transactionID")
         accounts = getUserAccounts(userID)
-        return render_template("edit_transaction.html", transactionID = transactionID, accounts = accounts)
+        return render_template(
+            "edit_transaction.html", transactionID=transactionID, accounts=accounts
+        )
+
 
 @app.route("/deleteTransaction", methods=["POST"])
 @loginRequired
@@ -372,7 +404,9 @@ def deleteTransaction():
             account.balance += transaction.amount
         else:
             if account.balance < transaction.amount:
-                return apology("If you delete this transaction the account balance will be negative")
+                return apology(
+                    "If you delete this transaction the account balance will be negative"
+                )
             account.balance -= transaction.amount
         db.session.delete(transaction)
         db.session.commit()
