@@ -237,6 +237,7 @@ select
 
 .loginContainer
 {
+    margin-top: 20rem;
     display: flex;
     flex-grow: 1;
     flex-direction: column;
@@ -249,7 +250,7 @@ select
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-top: -40vh;
+    margin-top: -80vh;
 }
 
 .loginButtonContainer
@@ -780,4 +781,84 @@ button:active
 .transactionsTable tbody .transactionRowEdit:nth-child(odd):hover
 {
     background-color: #f1f0f0; 
+}
+
+/* Flash Error & Success Messages */
+
+@keyframes slideOutFromTop {
+    70% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-100%);
+    }
+  }
+
+.flashContainer
+{
+    height: 13vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: center;
+    position: absolute;
+    animation: 800ms ease-in 2s 1 slideOutFromTop;
+    position: absolute;
+    animation-fill-mode: forwards;
+    pointer-events: none;
+}
+
+.flashes
+{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    background-color: white;
+    min-width: 17.25rem;
+    height: 3.5rem;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+    border-radius: 1rem;
+    align-self: center;
+}
+
+.flashLogoContainer
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
+}
+
+.errorContainer
+{
+    background-color: #fd6060;
+}
+
+.successContainer
+{
+    background-color: #47c75e;
+}
+
+.flashLogoContainer > img
+{
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.flashText
+{
+    display: flex;
+    flex-grow: 1;
+    min-width: 11.75rem;
+    max-width: 16.5rem;
+    padding-bottom: 0.5rem;
+    padding-top: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    color: #505050;
 }

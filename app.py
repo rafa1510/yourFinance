@@ -1,10 +1,18 @@
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import (
+    Flask,
+    flash,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+    get_flashed_messages,
+)
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import (
     GUEST_ACCOUNT_ID,
-    apology,
     loginRequired,
     usd,
     currentDate,
@@ -20,8 +28,7 @@ from helpers import (
     getTypeTotals,
     isBlank,
     getUser,
-    isInt,
-    isFloat,
+    isFloat
 )
 from models import db, User, Account, Transaction
 
@@ -94,8 +101,12 @@ def index():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    # Forget any user_id
-    session.clear()
+    # Clear user ID if user is logged in
+    try:
+        if session["user_id"]:
+            session.clear()
+    except:
+        pass
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
@@ -112,17 +123,21 @@ def login():
 
         # Ensure inputs are submitted
         if isBlank(username):
-            return apology("Must provide username")
+            flash("Must provide username", "error")
+            return redirect("/login")
         if isBlank(password):
-            return apology("Must provide password")
+            flash("Must provide password", "error")
+            return redirect("/login")
 
         user = getUser(username)
         if isBlank(user):
-            return apology("User does not exist")
+            flash("User does not exist", "error")
+            return redirect("/login")
 
         # Ensure username exists and password is correct
         if not check_password_hash(user.hash, password):
-            return apology("Invalid password")
+            flash("Invalid password", "error")
+            return redirect("/login")
 
         # Remember which user has logged in
         session["user_id"] = user.id
@@ -145,20 +160,26 @@ def register():
         allUsernames = db.session.execute(db.select(User.username)).scalars().all()
 
         if username in allUsernames:
-            return apology("User already exists")
+            flash("User already exists", "error")
+            return redirect("/register")
         elif isBlank(username):
-            return apology("Must provide username")
+            flash("Must provide username", "error")
+            return redirect("/register")
         elif isBlank(password):
-            return apology("Must provide password")
+            flash("Must provide password", "error")
+            return redirect("/register")
         elif isBlank(confirmation):
-            return apology("Must provide a confirmation password")
+            flash("Must provide a confirmation password", "error")
+            return redirect("/register")
         elif password != confirmation:
-            return apology("Password does not equal confirmation")
+            flash("Password does not equal confirmation", "error")
+            return redirect("/register")
         else:
             hashedPassword = generate_password_hash(password)
             user = User(username=username, hash=hashedPassword)
             db.session.add(user)
             db.session.commit()
+            flash("Your account has been created", "success")
             return redirect("/login")
     else:
         return render_template("register.html")
@@ -187,16 +208,20 @@ def addAccount():
     # Add account for user
     if request.method == "POST":
         if checkGuest(userID):
-            return apology("Guests can't modify transactions or accounts")
+            flash("Guests can't add accounts", "error")
+            return redirect("/addAccount")
 
         name = request.form.get("name")
+        category = request.form.get("category")
 
         if isBlank(name):
-            return apology("Must provide a name")
+            flash("Must provide a name", "error")
+            return redirect("/addAccount")
 
         account = Account(user_id=userID, category=category, name=name, balance=0)
         db.session.add(account)
         db.session.commit()
+        flash("Account has been added", "success")
         return redirect("/")
     else:
         return render_template("add_accounts.html")
@@ -218,7 +243,8 @@ def addTransaction():
     userID = session["user_id"]
     if request.method == "POST":
         if checkGuest(userID):
-            return apology("Guests can't modify transactions or accounts")
+            flash("Guests can't add transactions", "error")
+            return redirect("/addTransaction")
 
         dateTime = currentDate()
         transactionType = request.form.get("type")
@@ -228,21 +254,26 @@ def addTransaction():
         amount = request.form.get("amount")
 
         if isBlank(name):
-            return apology("Must provide a name")
+            flash("Must provide a name", "error")
+            return redirect("/addTransaction")
         if isBlank(category):
-            return apology("Must provide a category")
+            flash("Must provide a category", "error")
+            return redirect("/addTransaction")
         if isBlank(amount):
-            return apology("Please input an amount")
+            flash("Please input an amount", "error")
+            return redirect("/addTransaction")
 
         if not isFloat(amount):
-            return apology("Please input a number for the transaction amount")
+            flash("Please input a number for the transaction amount", "error")
+            return redirect("/addTransaction")
 
         accountID = int(accountID)
         amount = float(amount)
         account = getAccount(accountID)
 
         if amount <= 0:
-            return apology("Please input a positive amount")
+            flash("Please input a positive amount", "error")
+            return redirect("/addTransaction")
 
         transaction = Transaction(
             account_id=accountID,
@@ -256,7 +287,10 @@ def addTransaction():
         balance = account.balance
         if transactionType == "Expense":
             if balance < amount:
-                return apology("You do not have enough balance for this transaction")
+                flash(
+                    "Account does not have enough balance for this transaction", "error"
+                )
+                return redirect("/addTransaction")
             balance -= amount
             account.balance = balance
         else:
@@ -264,6 +298,7 @@ def addTransaction():
             account.balance = balance
         db.session.add(transaction)
         db.session.commit()
+        flash("Transaction has been added", "success")
         return redirect("/")
     else:
         accounts = getUserAccounts(userID)
@@ -276,30 +311,37 @@ def transfer():
     userID = session["user_id"]
     if request.method == "POST":
         if checkGuest(userID):
-            return apology("Guests can't modify transactions or accounts")
+            flash("Guests can't input transfers", "error")
+            return redirect("/transfer")
         dateTime = currentDate()
         fromID = request.form.get("from")
         toID = request.form.get("to")
         amount = request.form.get("amount")
 
         if isBlank(amount):
-            return apology("Please input an amount")
+            flash("Please input an amount", "error")
+            return redirect("/transfer")
         if fromID == toID:
-            return apology("Can't transfer to the same account")
+            flash("Can't transfer to the same account", "error")
+            return redirect("/transfer")
 
         if not isFloat(amount):
-            return apology("Please input a number for the transfer amount")
+            flash("Please input a number for the transfer amount", "error")
+            return redirect("/transfer")
 
         fromID = int(fromID)
         toID = int(toID)
+        amount = float(amount)
 
         fromAccount = getAccount(fromID)
         toAccount = getAccount(toID)
 
         if amount <= 0:
-            return apology("Please input a positive amount")
+            flash("Please input a positive amount", "error")
+            return redirect("/transfer")
         if fromAccount.balance < amount:
-            return apology("You do not have enough balance for this transfer")
+            flash("Account does not have enough balance for this transfer", "error")
+            return redirect("/transfer")
 
         fromAccount.balance -= amount
         toAccount.balance += amount
@@ -314,6 +356,7 @@ def transfer():
         )
         db.session.add(transaction)
         db.session.commit()
+        flash("Transfer successful", "success")
         return redirect("/")
     else:
         accounts = getUserAccounts(userID)
@@ -326,18 +369,21 @@ def editAccount():
     userID = session["user_id"]
     if request.method == "POST":
         if checkGuest(userID):
-            return apology("Guests can't modify transactions or accounts")
+            flash("Guests can't modify accounts", "error")
+            return redirect("/editAccount")
         accountID = request.form.get("accountID")
         name = request.form.get("name")
         category = request.form.get("category")
         account = getAccount(accountID)
 
         if isBlank(name):
-            return apology("Please input a name")
+            flash("Please input a name", "error")
+            return redirect("/editAccount")
 
         account.name = name
         account.category = category
         db.session.commit()
+        flash("Account has been modified", "success")
         return redirect("/")
     else:
         accountID = request.args.get("accountID")
@@ -350,7 +396,8 @@ def deleteAccount():
     userID = session["user_id"]
     if request.method == "POST":
         if checkGuest(userID):
-            return apology("Guests can't modify transactions or accounts")
+            flash("Guests can't delete accounts", "error")
+            return redirect("/editAccount")
         accountID = request.form.get("accountID")
         account = getAccount(accountID)
         # Delete transactions for account
@@ -359,6 +406,7 @@ def deleteAccount():
             db.session.delete(transaction)
         db.session.delete(account)
         db.session.commit()
+        flash("Account has been deleted", "success")
         return redirect("/")
 
 
@@ -368,18 +416,22 @@ def editTransaction():
     userID = session["user_id"]
     if request.method == "POST":
         if checkGuest(userID):
-            return apology("Guests can't modify transactions or accounts")
-        transaction = getTransaction(transactionID)
+            flash("Guests can't modify transactions", "error")
+            return redirect("/editTransaction")
         transactionID = request.form.get("transactionID")
+        transaction = getTransaction(transactionID)
         name = request.form.get("name")
         category = request.form.get("category")
         if isBlank(name):
-            return apology("Please input a name")
+            flash("Please input a name", "error")
+            return redirect("/editTransaction")
         if isBlank(category):
-            return apology("Please input a category")
+            flash("Please input a category", "error")
+            return redirect("/editTransaction")
         transaction.name = name
         transaction.category = category
         db.session.commit()
+        flash("Transaction has been modified", "success")
         return redirect("/")
     else:
         transactionID = request.args.get("transactionID")
@@ -395,7 +447,8 @@ def deleteTransaction():
     if request.method == "POST":
         userID = session["user_id"]
         if checkGuest(userID):
-            return apology("Guests can't modify transactions or accounts")
+            flash("Guests can't delete transactions", "error")
+            return redirect("/editTransaction")
         transactionID = request.form.get("transactionID")
         transaction = getTransaction(transactionID)
         # Find account
@@ -404,10 +457,13 @@ def deleteTransaction():
             account.balance += transaction.amount
         else:
             if account.balance < transaction.amount:
-                return apology(
-                    "If you delete this transaction the account balance will be negative"
+                flash(
+                    "Deleting this transaction will make the account balance negative",
+                    "error",
                 )
+                return redirect("/editTransaction")
             account.balance -= transaction.amount
         db.session.delete(transaction)
         db.session.commit()
+        flash("Transaction has been deleted", "success")
         return redirect("/")

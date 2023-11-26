@@ -43,6 +43,28 @@
         </div>
     </div>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flashContainer">
+            <ul class=flashes>
+                {% for category, message in messages %}
+                    {% if category == "error" %}
+                        <div class="flashLogoContainer errorContainer">
+                            <img src="static/errorIcon.svg">
+                        </div>
+                        <li class="flashText">{{ message }}</li>
+                    {% elif category == "success" %}
+                        <div class="flashLogoContainer successContainer">
+                            <img src="static/successIcon.svg">
+                        </div>
+                        <li class="flashText">{{ message }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% endwith %}
+
     <script>
         const deleteForm = document.querySelector(".deleteForm")
 

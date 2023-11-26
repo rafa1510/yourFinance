@@ -6,11 +6,6 @@ from functools import wraps
 GUEST_ACCOUNT_ID = 1
 
 
-def apology(message):
-    """Render message as an apology to user."""
-    return render_template("apology.html", top="Error", bottom=message)
-
-
 def loginRequired(f):
     """
     Decorate routes to require login.
@@ -51,19 +46,10 @@ def isBlank(data):
     return False
 
 
-def isInt(data):
-    try:
-        data = int(data)
-    except ValueError or TypeError:
-        return False
-    else:
-        return True
-
-
 def isFloat(data):
     try:
         data = float(data)
-    except ValueError or TypeError:
+    except (ValueError, TypeError):
         return False
     else:
         return True
@@ -155,9 +141,10 @@ def getTypeTotals(accounts, type):
     return typeTotal
 
 
-# Get month to month data to build the chart
+# Get month to month data to build the charts
 def getMonthTotals(userAccountsID):
     monthTotals = []
+    # Get all the user's transactions
     transactions = (
         db.session.execute(
             db.select(Transaction)
@@ -170,7 +157,9 @@ def getMonthTotals(userAccountsID):
     balance = 0
     for transaction in transactions:
         monthExists = False
+        # Conver the transaction date in the database to only the month date
         monthNumber = int(transaction.date[:-3])
+        # Get the month number
         monthName = calendar.month_name[monthNumber]
         for month in monthTotals:
             # Check if month exists in list already
@@ -188,6 +177,7 @@ def getMonthTotals(userAccountsID):
                 balance += int(transaction.amount)
                 month["Income"] = income
                 month["Balance"] = balance
+        # If it doesn't exist, then append the first transaction with that month
         else:
             if transaction.transactionType == "Expense":
                 balance -= int(transaction.amount)

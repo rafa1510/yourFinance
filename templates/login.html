@@ -5,7 +5,6 @@
 {% endblock %}
 
 {% block main %}
-
     <div class="loginContainer">
         <form class="loginForm" action="/login" method="post">
             <div class="credentialsContainer">
@@ -19,6 +18,29 @@
             </div>
         </form>
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flashContainer">
+            <ul class=flashes>
+                {% for category, message in messages %}
+                    {% if category == "error" %}
+                        <div class="flashLogoContainer errorContainer">
+                            <img src="static/errorIcon.svg">
+                        </div>
+                        <li class="flashText">{{ message }}</li>
+                    {% elif category == "success" %}
+                        <div class="flashLogoContainer successContainer">
+                            <img src="static/successIcon.svg">
+                        </div>
+                        <li class="flashText">{{ message }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    {% endwith %}
+
     {% if animationLoaded[0] != "True"%}
     <div class="titleContainer">
         <div class="titleLogoContainer">
