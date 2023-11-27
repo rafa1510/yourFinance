@@ -399,17 +399,17 @@ def addTransaction():
 def editAccount():
     userID = session["user_id"]
     if request.method == "POST":
+        accountID = request.form.get("accountID")
         if checkGuest(userID):
             flash("Guests can't modify accounts", "error")
-            return redirect("/editAccount")
-        accountID = request.form.get("accountID")
+            return render_template("edit_account.html", accountID=accountID)
         name = request.form.get("name")
         category = request.form.get("category")
         account = getAccount(accountID)
 
         if isBlank(name):
             flash("Must input a name", "error")
-            return redirect("/editAccount")
+            return render_template("edit_account.html", accountID=accountID)
 
         account.name = name
         account.category = category
@@ -426,19 +426,19 @@ def editAccount():
 def editTransaction():
     userID = session["user_id"]
     if request.method == "POST":
+        transactionID = request.form.get("transactionID")
         if checkGuest(userID):
             flash("Guests can't modify transactions", "error")
-            return redirect("/editTransaction")
-        transactionID = request.form.get("transactionID")
+            return render_template("edit_transaction.html", transactionID=transactionID)
         transaction = getTransaction(transactionID)
         name = request.form.get("name")
         category = request.form.get("category")
         if isBlank(name):
             flash("Must input a name", "error")
-            return redirect("/editTransaction")
+            return render_template("edit_transaction.html", transactionID=transactionID)
         if isBlank(category):
             flash("Must input a category", "error")
-            return redirect("/editTransaction")
+            return render_template("edit_transaction.html", transactionID=transactionID)
         transaction.name = name
         transaction.category = category
         db.session.commit()
@@ -446,10 +446,7 @@ def editTransaction():
         return redirect("/")
     else:
         transactionID = request.args.get("transactionID")
-        accounts = getUserAccounts(userID)
-        return render_template(
-            "edit_transaction.html", transactionID=transactionID, accounts=accounts
-        )
+        return render_template("edit_transaction.html", transactionID=transactionID)
 
 
 @app.route("/deleteAccount", methods=["POST"])
