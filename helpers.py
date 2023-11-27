@@ -34,6 +34,11 @@ def dateToMonth(date):
     return month
 
 
+def dateToYear(date):
+    year = date[:4]
+    return year
+
+
 def shortDate(date):
     shortenedDate = date[5:10]
     return shortenedDate
@@ -154,7 +159,7 @@ def getMonthTotals(userAccountsID):
         db.session.execute(
             db.select(Transaction)
             .where(Transaction.account_id.in_(userAccountsID))
-            .order_by(Transaction.id.asc())
+            .order_by(Transaction.date.asc(), Transaction.id.desc())
         )
         .scalars()
         .all()
@@ -166,9 +171,10 @@ def getMonthTotals(userAccountsID):
         monthNumber = int(dateToMonth(transaction.date))
         # Get the month number
         monthName = calendar.month_name[monthNumber]
+        monthYear = int(dateToYear(transaction.date))
         for month in monthTotals:
             # Check if month exists in list already
-            if month["Month"] == monthName:
+            if (month["Month"] == monthName) and (month["Year"] == monthYear):
                 monthExists = True
         # If it exists then update values
         if monthExists == True:
@@ -189,6 +195,7 @@ def getMonthTotals(userAccountsID):
                 transactionDict = {
                     "monthNumber": monthNumber,
                     "Month": monthName,
+                    "Year": monthYear,
                     "Expenses": int(transaction.amount),
                     "Income": 0,
                     "Balance": balance,
@@ -199,6 +206,7 @@ def getMonthTotals(userAccountsID):
                 transactionDict = {
                     "monthNumber": monthNumber,
                     "Month": monthName,
+                    "Year": monthYear,
                     "Expenses": 0,
                     "Income": int(transaction.amount),
                     "Balance": balance,
