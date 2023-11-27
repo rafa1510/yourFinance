@@ -125,7 +125,7 @@ def getAccountsTransactions(userAccountsID):
         db.session.execute(
             db.select(Transaction)
             .where(Transaction.account_id.in_(userAccountsID))
-            .order_by(Transaction.date.desc())
+            .order_by(Transaction.date.desc(), Transaction.id.desc())
         )
         .scalars()
         .all()
