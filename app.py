@@ -54,9 +54,6 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-# Keep's track if title animation has been loaded
-animationLoaded = []
-
 
 @app.after_request
 def after_request(response):
@@ -110,6 +107,13 @@ def login():
     except:
         pass
 
+    # Check if animation has been loaded for user
+    try:
+        if session["animationLoaded"]:
+            animationLoaded = session["animationLoaded"]
+    except:
+        animationLoaded = False
+
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         checkGuestLogin = request.form.get("guestForm")
@@ -151,6 +155,7 @@ def login():
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
+        session["animationLoaded"] = True
         return render_template("login.html", animationLoaded=animationLoaded)
 
 
