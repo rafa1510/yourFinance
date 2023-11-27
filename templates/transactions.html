@@ -48,7 +48,7 @@
                                 <form class="editForm" action="/editTransaction" method="get" id = {{ transaction.id }}>
                                     <input type="hidden" name="transactionID" value={{ transaction.id }}>
                                     <tr class="transactionRowEdit" onclick="document.getElementById( '{{ transaction.id }}' ).submit();">
-                                        <td class="transactionDate">{{ transaction.date }}</td>
+                                        <td class="transactionDate">{{ transaction.date | shortDate }}</td>
                                         <td class="transactionName">{{ transaction.name }}</td>
                                         <td class="transactionCategory">{{ transaction.category }}</td>
                                         <td class="transactionAccount">{{ transaction.accountName }}</td>

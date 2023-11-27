@@ -15,7 +15,6 @@ from helpers import (
     GUEST_ACCOUNT_ID,
     loginRequired,
     usd,
-    currentDate,
     checkGuest,
     getUserByID,
     getUserAccounts,
@@ -29,14 +28,17 @@ from helpers import (
     isBlank,
     getUser,
     isFloat,
+    shortDate,
+    balanceAtDate,
 )
 from models import db, User, Account, Transaction
 
 # Configure application
 app = Flask(__name__)
 
-# Custom filter
+# Custom filters
 app.jinja_env.filters["usd"] = usd
+app.jinja_env.filters["shortDate"] = shortDate
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
@@ -85,7 +87,7 @@ def index():
     transactions = []
     counter = 0
     for transaction in allTransactions:
-        if counter < 5:
+        if counter < 4:
             transactions.append(transaction)
             counter += 1
 
@@ -111,9 +113,11 @@ def login():
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         checkGuestLogin = request.form.get("guestForm")
-        print(checkGuestLogin)
         if checkGuestLogin == "GUEST_LOGIN":
             user = getUserByID(GUEST_ACCOUNT_ID)
+            if isBlank(user):
+                flash("Guest does not exist", "error")
+                return redirect("/login")
             session["user_id"] = user.id
             return redirect("/")
 
@@ -218,20 +222,29 @@ def transfer():
         if checkGuest(userID):
             flash("Guests can't input transfers", "error")
             return redirect("/transfer")
-        dateTime = currentDate()
+        date = request.form.get("date")
         fromID = request.form.get("from")
         toID = request.form.get("to")
         amount = request.form.get("amount")
 
+        if isBlank(date):
+            flash("Must provide a date", "error")
+            return redirect("/transfer")
         if isBlank(amount):
-            flash("Please input an amount", "error")
+            flash("Must provide an amount", "error")
+            return redirect("/transfer")
+        if isBlank(fromID):
+            flash("Must select an account to transfer from", "error")
+            return redirect("/transfer")
+        if isBlank(toID):
+            flash("Must select an account to transfer to", "error")
             return redirect("/transfer")
         if fromID == toID:
             flash("Can't transfer to the same account", "error")
             return redirect("/transfer")
 
         if not isFloat(amount):
-            flash("Please input a number for the transfer amount", "error")
+            flash("Must input a number for the transfer amount", "error")
             return redirect("/transfer")
 
         fromID = int(fromID)
@@ -242,24 +255,34 @@ def transfer():
         toAccount = getAccount(toID)
 
         if amount <= 0:
-            flash("Please input a positive amount", "error")
+            flash("Must input a positive amount", "error")
             return redirect("/transfer")
-        if fromAccount.balance < amount:
+        if (fromAccount.balance < amount) or (balanceAtDate(date, fromID) < amount):
             flash("Account does not have enough balance for this transfer", "error")
             return redirect("/transfer")
 
         fromAccount.balance -= amount
         toAccount.balance += amount
-        transaction = Transaction(
+        fromTransaction = Transaction(
             account_id=fromID,
-            date=dateTime,
-            transactionType="Transfer",
-            name="Internal Transfer",
-            category="Transfer",
+            date=date,
+            transactionType="Outgoing Transfer",
+            name="Transfer to " + toAccount.name,
+            category="Outgoing Transfer",
             accountName=fromAccount.name,
             amount=amount,
         )
-        db.session.add(transaction)
+        db.session.add(fromTransaction)
+        toTransaction = Transaction(
+            account_id=toID,
+            date=date,
+            transactionType="Incoming Transfer",
+            name="Transfer from " + fromAccount.name,
+            category="Incoming Transfer",
+            accountName=toAccount.name,
+            amount=amount,
+        )
+        db.session.add(toTransaction)
         db.session.commit()
         flash("Transfer successful", "success")
         return redirect("/")
@@ -304,25 +327,31 @@ def addTransaction():
             flash("Guests can't add transactions", "error")
             return redirect("/addTransaction")
 
-        dateTime = currentDate()
+        date = request.form.get("date")
         transactionType = request.form.get("type")
         name = request.form.get("name")
         category = request.form.get("category")
         accountID = request.form.get("account")
         amount = request.form.get("amount")
 
+        if isBlank(date):
+            flash("Must provide a date", "error")
+            return redirect("/addTransaction")
         if isBlank(name):
             flash("Must provide a name", "error")
             return redirect("/addTransaction")
         if isBlank(category):
             flash("Must provide a category", "error")
             return redirect("/addTransaction")
+        if isBlank(accountID):
+            flash("Must select an account", "error")
+            return redirect("/addTransaction")
         if isBlank(amount):
-            flash("Please input an amount", "error")
+            flash("Must input an amount", "error")
             return redirect("/addTransaction")
 
         if not isFloat(amount):
-            flash("Please input a number for the transaction amount", "error")
+            flash("Must input a number for the transaction amount", "error")
             return redirect("/addTransaction")
 
         accountID = int(accountID)
@@ -330,21 +359,13 @@ def addTransaction():
         account = getAccount(accountID)
 
         if amount <= 0:
-            flash("Please input a positive amount", "error")
+            flash("Must input a positive amount", "error")
             return redirect("/addTransaction")
 
-        transaction = Transaction(
-            account_id=accountID,
-            date=dateTime,
-            transactionType=transactionType,
-            name=name,
-            category=category,
-            accountName=account.name,
-            amount=amount,
-        )
         balance = account.balance
         if transactionType == "Expense":
-            if balance < amount:
+            if (balance < amount) or (balanceAtDate(date, accountID) < amount):
+                print(balanceAtDate(date, accountID))
                 flash(
                     "Account does not have enough balance for this transaction", "error"
                 )
@@ -354,6 +375,16 @@ def addTransaction():
         else:
             balance += amount
             account.balance = balance
+
+        transaction = Transaction(
+            account_id=accountID,
+            date=date,
+            transactionType=transactionType,
+            name=name,
+            category=category,
+            accountName=account.name,
+            amount=amount,
+        )
         db.session.add(transaction)
         db.session.commit()
         flash("Transaction has been added", "success")
@@ -377,7 +408,7 @@ def editAccount():
         account = getAccount(accountID)
 
         if isBlank(name):
-            flash("Please input a name", "error")
+            flash("Must input a name", "error")
             return redirect("/editAccount")
 
         account.name = name
@@ -403,10 +434,10 @@ def editTransaction():
         name = request.form.get("name")
         category = request.form.get("category")
         if isBlank(name):
-            flash("Please input a name", "error")
+            flash("Must input a name", "error")
             return redirect("/editTransaction")
         if isBlank(category):
-            flash("Please input a category", "error")
+            flash("Must input a category", "error")
             return redirect("/editTransaction")
         transaction.name = name
         transaction.category = category

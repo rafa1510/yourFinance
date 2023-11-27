@@ -12,6 +12,10 @@
                 <form action="/transfer" method="post" class="addTransactionForm">
                     <h2 class="chartTitle">Transfer</h2>
                     <div class="transactionFormRow">
+                        <h3 class="transactionSubtitle">Date</h3>
+                        <input class="transactionInput" type="date" name="date"></input>
+                    </div>
+                    <div class="transactionFormRow">
                         <h3 class="transactionSubtitle">From</h3>
                         <select class="transactionInput" name="from">
                             {% for account in accounts %}

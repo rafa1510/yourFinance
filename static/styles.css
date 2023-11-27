@@ -635,7 +635,7 @@ button:active
     
     .transactionDate
     {
-        width: 5%;
+        width: 8%;
     }
 
     .transactionName
@@ -650,7 +650,7 @@ button:active
 
     .transactionAccount
     {
-        width: 15%;
+        width: 12%;
     }
 
     .transactionAmount
@@ -669,12 +669,12 @@ button:active
     }
     .transactionDate
     {
-        width: 10%
+        width: 20%
     }
 
     .transactionName
     {
-        width: 60%;
+        width: 55%;
     }
 
     .transactionCategory
@@ -691,7 +691,7 @@ button:active
 
     .transactionAmount
     {
-        width: 30%;
+        width: 25%;
     }
 }
 

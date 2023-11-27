@@ -95,7 +95,7 @@
                                 <tbody>
                                     {% for transaction in transactions %}
                                         <tr class="transactionRow">
-                                            <td class="transactionDate">{{ transaction.date }}</td>
+                                            <td class="transactionDate">{{ transaction.date | shortDate }}</td>
                                             <td class="transactionName">{{ transaction.name }}</td>
                                             <td class="transactionCategory">{{ transaction.category }}</td>
                                             <td class="transactionAccount">{{ transaction.accountName }}</td>

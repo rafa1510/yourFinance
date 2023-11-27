@@ -27,11 +27,16 @@ def usd(value):
     return f"${value:,.2f}"
 
 
-def currentDate():
-    dateTime = datetime.datetime.now()
-    dateTime = dateTime.strftime("%x")
-    dateTime = dateTime[:-3]
-    return dateTime
+def dateToMonth(date):
+    month = date[5:7]
+    if month[0] == "0":
+        month = month[1:]
+    return month
+
+
+def shortDate(date):
+    shortenedDate = date[5:10]
+    return shortenedDate
 
 
 def checkGuest(userID):
@@ -120,7 +125,7 @@ def getAccountsTransactions(userAccountsID):
         db.session.execute(
             db.select(Transaction)
             .where(Transaction.account_id.in_(userAccountsID))
-            .order_by(Transaction.id.desc())
+            .order_by(Transaction.date.desc())
         )
         .scalars()
         .all()
@@ -157,8 +162,8 @@ def getMonthTotals(userAccountsID):
     balance = 0
     for transaction in transactions:
         monthExists = False
-        # Conver the transaction date in the database to only the month date
-        monthNumber = int(transaction.date[:-3])
+        # Convert the transaction date in the database to only the month date
+        monthNumber = int(dateToMonth(transaction.date))
         # Get the month number
         monthName = calendar.month_name[monthNumber]
         for month in monthTotals:
@@ -201,3 +206,19 @@ def getMonthTotals(userAccountsID):
                 monthTotals.append(transactionDict)
 
     return monthTotals
+
+
+def balanceAtDate(date, accountID):
+    balance = 0
+    transactions = getAccountTransactions(accountID)
+    for transaction in transactions:
+        if transaction.date <= date:
+            if (transaction.transactionType == "Expense") or (
+                transaction.transactionType == "Outgoing Transfer"
+            ):
+                balance -= transaction.amount
+            elif (transaction.transactionType == "Income") or (
+                transaction.transactionType == "Incoming Transfer"
+            ):
+                balance += transaction.amount
+    return balance
