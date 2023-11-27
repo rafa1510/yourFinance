@@ -30,12 +30,28 @@
                 <form action="/editTransaction" method="post" class="addTransactionForm">
                     <input type="hidden" name="transactionID" value={{ transactionID }}>
                     <div class="transactionFormRow">
+                        <h3 class="transactionSubtitle">Date</h3>
+                        <h2 class="transactionData" type="text" name="date">{{ transaction.date }}</h2>
+                    </div>
+                    <div class="transactionFormRow">
+                        <h3 class="transactionSubtitle">Type</h3>
+                        <h2 class="transactionData" type="text" name="date">{{ transaction.transactionType }}</h2>
+                    </div>
+                    <div class="transactionFormRow">
                         <h3 class="transactionSubtitle">Name</h3>
-                        <input class="transactionInput" type="text" name="name"></input>
+                        <input class="transactionInput" type="text" name="name" placeholder="{{ transaction.name }}"></input>
                     </div>
                     <div class="transactionFormRow">
                         <h3 class="transactionSubtitle">Category</h3>
-                        <input class="transactionInput" name="category"></input>
+                        <input class="transactionInput" name="category" placeholder="{{ transaction.category }}"></input>
+                    </div>
+                    <div class="transactionFormRow">
+                        <h3 class="transactionSubtitle">Account</h3>
+                        <h2 class="transactionData" type="text" name="accountName">{{ transaction.accountName }}</h2>
+                    </div>
+                    <div class="transactionFormRow">
+                        <h3 class="transactionSubtitle">Amount</h3>
+                        <h2 class="transactionData" type="text" name="amount">{{ transaction.amount | usd }}</h2>
                     </div>
                     <button class="loginButton" type="submit">Submit</button>
                 </form>

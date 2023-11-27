@@ -418,7 +418,10 @@ def editAccount():
         return redirect("/")
     else:
         accountID = request.args.get("accountID")
-        return render_template("edit_account.html", accountID=accountID)
+        account = getAccount(accountID)
+        return render_template(
+            "edit_account.html", accountID=accountID, account=account
+        )
 
 
 @app.route("/editTransaction", methods=["GET", "POST"])
@@ -446,7 +449,12 @@ def editTransaction():
         return redirect("/")
     else:
         transactionID = request.args.get("transactionID")
-        return render_template("edit_transaction.html", transactionID=transactionID)
+        transaction = getTransaction(transactionID)
+        return render_template(
+            "edit_transaction.html",
+            transactionID=transactionID,
+            transaction=transaction,
+        )
 
 
 @app.route("/deleteAccount", methods=["POST"])

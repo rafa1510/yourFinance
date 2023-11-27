@@ -732,6 +732,14 @@ button:active
     font-weight: 500;
 }
 
+.transactionData
+{
+    font-size: 1.25rem;
+    font-weight: 400;
+    width: 14rem;
+    text-align: left;
+}
+
 .transactionInput
 {
     width: 14rem;
@@ -741,6 +749,11 @@ button:active
     border-radius: 0;
     font-weight: 400;
     background-color: white;
+}
+
+.transactionInput::placeholder
+{
+    color: rgb(163, 163, 163);
 }
 
 /* Styling for the edittable accounts & transactions */

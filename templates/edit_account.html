@@ -30,8 +30,8 @@
                 <form action="/editAccount" method="post" class="addTransactionForm">
                     <div class="transactionFormRow">
                         <h3 class="transactionSubtitle">Name</h3>
-                        <input class="transactionInput" type="text" name="name"></input>
-                        <input type="hidden" name="accountID" value={{ accountID }}>
+                        <input class="transactionInput" type="text" name="name" placeholder="{{ account.name }}" ></input>
+                        <input type="hidden" name="accountID" value="{{ accountID }}">
                     </div>
                     <div class="transactionFormRow">
                         <h3 class="transactionSubtitle">Category</h3>
@@ -39,6 +39,10 @@
                             <option value="Checking">Checking</option>
                             <option value="Savings">Savings</option>
                         </select>
+                    </div>
+                    <div class="transactionFormRow">
+                        <h3 class="transactionSubtitle">Balance</h3>
+                        <h2 class="transactionData" type="text" name="balance">{{ account.balance | usd }}</h2>
                     </div>
                     <button class="loginButton" type="submit">Submit</button>
                 </form>
