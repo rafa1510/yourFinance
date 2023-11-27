@@ -28,7 +28,7 @@ from helpers import (
     getTypeTotals,
     isBlank,
     getUser,
-    isFloat
+    isFloat,
 )
 from models import db, User, Account, Transaction
 
@@ -201,6 +201,73 @@ def accounts():
     )
 
 
+@app.route("/transactions")
+@loginRequired
+def transactions():
+    userID = session["user_id"]
+    userAccountsID = getUserAccountsID(userID)
+    transactions = getAccountsTransactions(userAccountsID)
+    return render_template("transactions.html", transactions=transactions)
+
+
+@app.route("/transfer", methods=["GET", "POST"])
+@loginRequired
+def transfer():
+    userID = session["user_id"]
+    if request.method == "POST":
+        if checkGuest(userID):
+            flash("Guests can't input transfers", "error")
+            return redirect("/transfer")
+        dateTime = currentDate()
+        fromID = request.form.get("from")
+        toID = request.form.get("to")
+        amount = request.form.get("amount")
+
+        if isBlank(amount):
+            flash("Please input an amount", "error")
+            return redirect("/transfer")
+        if fromID == toID:
+            flash("Can't transfer to the same account", "error")
+            return redirect("/transfer")
+
+        if not isFloat(amount):
+            flash("Please input a number for the transfer amount", "error")
+            return redirect("/transfer")
+
+        fromID = int(fromID)
+        toID = int(toID)
+        amount = float(amount)
+
+        fromAccount = getAccount(fromID)
+        toAccount = getAccount(toID)
+
+        if amount <= 0:
+            flash("Please input a positive amount", "error")
+            return redirect("/transfer")
+        if fromAccount.balance < amount:
+            flash("Account does not have enough balance for this transfer", "error")
+            return redirect("/transfer")
+
+        fromAccount.balance -= amount
+        toAccount.balance += amount
+        transaction = Transaction(
+            account_id=fromID,
+            date=dateTime,
+            transactionType="Transfer",
+            name="Internal Transfer",
+            category="Transfer",
+            accountName=fromAccount.name,
+            amount=amount,
+        )
+        db.session.add(transaction)
+        db.session.commit()
+        flash("Transfer successful", "success")
+        return redirect("/")
+    else:
+        accounts = getUserAccounts(userID)
+        return render_template("transfer.html", accounts=accounts)
+
+
 @app.route("/addAccount", methods=["GET", "POST"])
 @loginRequired
 def addAccount():
@@ -225,15 +292,6 @@ def addAccount():
         return redirect("/")
     else:
         return render_template("add_accounts.html")
-
-
-@app.route("/transactions")
-@loginRequired
-def transactions():
-    userID = session["user_id"]
-    userAccountsID = getUserAccountsID(userID)
-    transactions = getAccountsTransactions(userAccountsID)
-    return render_template("transactions.html", transactions=transactions)
 
 
 @app.route("/addTransaction", methods=["GET", "POST"])
@@ -305,64 +363,6 @@ def addTransaction():
         return render_template("add_transaction.html", accounts=accounts)
 
 
-@app.route("/transfer", methods=["GET", "POST"])
-@loginRequired
-def transfer():
-    userID = session["user_id"]
-    if request.method == "POST":
-        if checkGuest(userID):
-            flash("Guests can't input transfers", "error")
-            return redirect("/transfer")
-        dateTime = currentDate()
-        fromID = request.form.get("from")
-        toID = request.form.get("to")
-        amount = request.form.get("amount")
-
-        if isBlank(amount):
-            flash("Please input an amount", "error")
-            return redirect("/transfer")
-        if fromID == toID:
-            flash("Can't transfer to the same account", "error")
-            return redirect("/transfer")
-
-        if not isFloat(amount):
-            flash("Please input a number for the transfer amount", "error")
-            return redirect("/transfer")
-
-        fromID = int(fromID)
-        toID = int(toID)
-        amount = float(amount)
-
-        fromAccount = getAccount(fromID)
-        toAccount = getAccount(toID)
-
-        if amount <= 0:
-            flash("Please input a positive amount", "error")
-            return redirect("/transfer")
-        if fromAccount.balance < amount:
-            flash("Account does not have enough balance for this transfer", "error")
-            return redirect("/transfer")
-
-        fromAccount.balance -= amount
-        toAccount.balance += amount
-        transaction = Transaction(
-            account_id=fromID,
-            date=dateTime,
-            transactionType="Transfer",
-            name="Internal Transfer",
-            category="Transfer",
-            accountName=fromAccount.name,
-            amount=amount,
-        )
-        db.session.add(transaction)
-        db.session.commit()
-        flash("Transfer successful", "success")
-        return redirect("/")
-    else:
-        accounts = getUserAccounts(userID)
-        return render_template("transfer.html", accounts=accounts)
-
-
 @app.route("/editAccount", methods=["GET", "POST"])
 @loginRequired
 def editAccount():
@@ -388,26 +388,6 @@ def editAccount():
     else:
         accountID = request.args.get("accountID")
         return render_template("edit_account.html", accountID=accountID)
-
-
-@app.route("/deleteAccount", methods=["POST"])
-@loginRequired
-def deleteAccount():
-    userID = session["user_id"]
-    if request.method == "POST":
-        if checkGuest(userID):
-            flash("Guests can't delete accounts", "error")
-            return redirect("/editAccount")
-        accountID = request.form.get("accountID")
-        account = getAccount(accountID)
-        # Delete transactions for account
-        transactions = getAccountTransactions(accountID)
-        for transaction in transactions:
-            db.session.delete(transaction)
-        db.session.delete(account)
-        db.session.commit()
-        flash("Account has been deleted", "success")
-        return redirect("/")
 
 
 @app.route("/editTransaction", methods=["GET", "POST"])
@@ -439,6 +419,26 @@ def editTransaction():
         return render_template(
             "edit_transaction.html", transactionID=transactionID, accounts=accounts
         )
+
+
+@app.route("/deleteAccount", methods=["POST"])
+@loginRequired
+def deleteAccount():
+    userID = session["user_id"]
+    if request.method == "POST":
+        if checkGuest(userID):
+            flash("Guests can't delete accounts", "error")
+            return redirect("/editAccount")
+        accountID = request.form.get("accountID")
+        account = getAccount(accountID)
+        # Delete transactions for account
+        transactions = getAccountTransactions(accountID)
+        for transaction in transactions:
+            db.session.delete(transaction)
+        db.session.delete(account)
+        db.session.commit()
+        flash("Account has been deleted", "success")
+        return redirect("/")
 
 
 @app.route("/deleteTransaction", methods=["POST"])
