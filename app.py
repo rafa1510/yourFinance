@@ -405,17 +405,19 @@ def editAccount():
     userID = session["user_id"]
     if request.method == "POST":
         accountID = request.form.get("accountID")
+        account = getAccount(accountID)
         if checkGuest(userID):
             flash("Guests can't modify accounts", "error")
-            return render_template("edit_account.html", accountID=accountID)
+            return render_template(
+                "edit_account.html", accountID=accountID, account=account
+            )
         name = request.form.get("name")
         category = request.form.get("category")
-        account = getAccount(accountID)
-
         if isBlank(name):
             flash("Must input a name", "error")
-            return render_template("edit_account.html", accountID=accountID)
-
+            return render_template(
+                "edit_account.html", accountID=accountID, account=account
+            )
         account.name = name
         account.category = category
         db.session.commit()
@@ -435,18 +437,30 @@ def editTransaction():
     userID = session["user_id"]
     if request.method == "POST":
         transactionID = request.form.get("transactionID")
+        transaction = getTransaction(transactionID)
         if checkGuest(userID):
             flash("Guests can't modify transactions", "error")
-            return render_template("edit_transaction.html", transactionID=transactionID)
-        transaction = getTransaction(transactionID)
+            return render_template(
+                "edit_transaction.html",
+                transactionID=transactionID,
+                transaction=transaction,
+            )
         name = request.form.get("name")
         category = request.form.get("category")
         if isBlank(name):
             flash("Must input a name", "error")
-            return render_template("edit_transaction.html", transactionID=transactionID)
+            return render_template(
+                "edit_transaction.html",
+                transactionID=transactionID,
+                transaction=transaction,
+            )
         if isBlank(category):
             flash("Must input a category", "error")
-            return render_template("edit_transaction.html", transactionID=transactionID)
+            return render_template(
+                "edit_transaction.html",
+                transactionID=transactionID,
+                transaction=transaction,
+            )
         transaction.name = name
         transaction.category = category
         db.session.commit()
@@ -467,11 +481,13 @@ def editTransaction():
 def deleteAccount():
     userID = session["user_id"]
     if request.method == "POST":
-        if checkGuest(userID):
-            flash("Guests can't delete accounts", "error")
-            return redirect("/editAccount")
         accountID = request.form.get("accountID")
         account = getAccount(accountID)
+        if checkGuest(userID):
+            flash("Guests can't delete accounts", "error")
+            return render_template(
+                "edit_account.html", accountID=accountID, account=account
+            )
         # Delete transactions for account
         transactions = getAccountTransactions(accountID)
         for transaction in transactions:
@@ -485,13 +501,17 @@ def deleteAccount():
 @app.route("/deleteTransaction", methods=["POST"])
 @loginRequired
 def deleteTransaction():
+    userID = session["user_id"]
     if request.method == "POST":
-        userID = session["user_id"]
-        if checkGuest(userID):
-            flash("Guests can't delete transactions", "error")
-            return redirect("/editTransaction")
         transactionID = request.form.get("transactionID")
         transaction = getTransaction(transactionID)
+        if checkGuest(userID):
+            flash("Guests can't delete transactions", "error")
+            return render_template(
+                "edit_transaction.html",
+                transactionID=transactionID,
+                transaction=transaction,
+            )
         # Find account
         account = getAccount(transaction.account_id)
         if transaction.transactionType == "Expense":
@@ -502,7 +522,11 @@ def deleteTransaction():
                     "Deleting this transaction will make the account balance negative",
                     "error",
                 )
-                return redirect("/editTransaction")
+                return render_template(
+                    "edit_transaction.html",
+                    transactionID=transactionID,
+                    transaction=transaction,
+                )
             account.balance -= transaction.amount
         db.session.delete(transaction)
         db.session.commit()
