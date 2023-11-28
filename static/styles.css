@@ -510,7 +510,11 @@ button:active
     height: 32px; 
 }
 
-.barButton,
+.barButton
+{
+    border-left: 1px solid black;
+}
+
 .transferButton
 {
     border-left: 1px solid black;
