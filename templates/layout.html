@@ -18,7 +18,7 @@
     {% if session["user_id"] %}
     <div class="navbarContainer">
         <div class="navbarMobileTop">
-            <h2 class="navbarLogo" >yourFinance</h2>
+            <a href="/"><h2 class="navbarLogo" >yourFinance</h2></a>
             <a href="javascript:void(0);" class="menuContainer" onclick="toggleMenu()">
                 <img class="menu" src="static/menu.svg">
             </a>
@@ -33,7 +33,7 @@
     {% else %}
     <div class="loginNavbarContainer">
         <div class="navbarMobileTop">
-            <h2 class="navbarLogo" >yourFinance</h2>
+            <a href="/"><h2 class="navbarLogo" >yourFinance</h2></a>
             <a href="javascript:void(0);" class="menuContainer" onclick="toggleLoginMenu()">
                 <img class="menu" src="static/menu.svg">
             </a>
