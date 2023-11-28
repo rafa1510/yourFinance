@@ -84,7 +84,7 @@ def index():
     transactions = []
     counter = 0
     for transaction in allTransactions:
-        if counter < 4:
+        if counter < 5:
             transactions.append(transaction)
             counter += 1
 
