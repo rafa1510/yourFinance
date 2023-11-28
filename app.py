@@ -114,7 +114,6 @@ def login():
     except:
         animationLoaded = False
 
-    # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         checkGuestLogin = request.form.get("guestForm")
         if checkGuestLogin == "GUEST_LOGIN":
@@ -136,7 +135,8 @@ def login():
         if isBlank(password):
             flash("Must provide password", "error")
             return redirect("/login")
-
+        
+        # Ensure user exists
         user = getUser(username)
         if isBlank(user):
             flash("User does not exist", "error")
@@ -150,10 +150,8 @@ def login():
         # Remember which user has logged in
         session["user_id"] = user.id
 
-        # Redirect user to home page
         return redirect("/")
 
-    # User reached route via GET (as by clicking a link or via redirect)
     else:
         session["animationLoaded"] = True
         return render_template("login.html", animationLoaded=animationLoaded)
@@ -161,16 +159,18 @@ def login():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    """Register user"""
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
         allUsernames = db.session.execute(db.select(User.username)).scalars().all()
 
+        # Ensure user doesn't exist
         if username in allUsernames:
             flash("User already exists", "error")
             return redirect("/register")
+        
+        # Ensure inputs are submitted
         elif isBlank(username):
             flash("Must provide username", "error")
             return redirect("/register")
@@ -180,6 +180,8 @@ def register():
         elif isBlank(confirmation):
             flash("Must provide a confirmation password", "error")
             return redirect("/register")
+        
+        # Ensure password equals confirmation
         elif password != confirmation:
             flash("Password does not equal confirmation", "error")
             return redirect("/register")
@@ -224,6 +226,8 @@ def transactions():
 def transfer():
     userID = session["user_id"]
     if request.method == "POST":
+
+        # Ensure user isn't a guest
         if checkGuest(userID):
             flash("Guests can't input transfers", "error")
             return redirect("/transfer")
@@ -232,6 +236,7 @@ def transfer():
         toID = request.form.get("to")
         amount = request.form.get("amount")
 
+        # Ensure inputs are submitted
         if isBlank(date):
             flash("Must provide a date", "error")
             return redirect("/transfer")
@@ -244,10 +249,13 @@ def transfer():
         if isBlank(toID):
             flash("Must select an account to transfer to", "error")
             return redirect("/transfer")
+        
+        # Ensure user isn't transferring to the same account
         if fromID == toID:
             flash("Can't transfer to the same account", "error")
             return redirect("/transfer")
-
+        
+        # Ensure amount is a number
         if not isFloat(amount):
             flash("Must input a number for the transfer amount", "error")
             return redirect("/transfer")
@@ -259,13 +267,17 @@ def transfer():
         fromAccount = getAccount(fromID)
         toAccount = getAccount(toID)
 
+        # Ensure user inputs a positive amount
         if amount <= 0:
             flash("Must input a positive amount", "error")
             return redirect("/transfer")
+        
+        # Ensure account has enough balance either currently or at the date the transfer is set
         if (fromAccount.balance < amount) or (balanceAtDate(date, fromID) < amount):
             flash("Account does not have enough balance for this transfer", "error")
             return redirect("/transfer")
-
+        
+        # Add outgoing transfer transaction
         fromAccount.balance -= amount
         toAccount.balance += amount
         fromTransaction = Transaction(
@@ -278,6 +290,8 @@ def transfer():
             amount=amount,
         )
         db.session.add(fromTransaction)
+
+        # Add incoming transfer transaction
         toTransaction = Transaction(
             account_id=toID,
             date=date,
@@ -302,6 +316,8 @@ def addAccount():
     userID = session["user_id"]
     # Add account for user
     if request.method == "POST":
+
+        # Ensure user isn't a guest
         if checkGuest(userID):
             flash("Guests can't add accounts", "error")
             return redirect("/addAccount")
@@ -309,6 +325,7 @@ def addAccount():
         name = request.form.get("name")
         category = request.form.get("category")
 
+        # Ensure name is submitted
         if isBlank(name):
             flash("Must provide a name", "error")
             return redirect("/addAccount")
@@ -328,10 +345,13 @@ def addTransaction():
     # Add transaction to account
     userID = session["user_id"]
     if request.method == "POST":
+
+        # Ensure user isn't a guest
         if checkGuest(userID):
             flash("Guests can't add transactions", "error")
             return redirect("/addTransaction")
-
+        
+        # Get data from form
         date = request.form.get("date")
         transactionType = request.form.get("type")
         name = request.form.get("name")
@@ -339,6 +359,7 @@ def addTransaction():
         accountID = request.form.get("account")
         amount = request.form.get("amount")
 
+        # Ensure inputs are submitted
         if isBlank(date):
             flash("Must provide a date", "error")
             return redirect("/addTransaction")
@@ -354,7 +375,8 @@ def addTransaction():
         if isBlank(amount):
             flash("Must input an amount", "error")
             return redirect("/addTransaction")
-
+        
+        # Ensure amount is a number
         if not isFloat(amount):
             flash("Must input a number for the transaction amount", "error")
             return redirect("/addTransaction")
@@ -363,12 +385,15 @@ def addTransaction():
         amount = float(amount)
         account = getAccount(accountID)
 
+        # Ensure user inputs a positive amoount
         if amount <= 0:
             flash("Must input a positive amount", "error")
             return redirect("/addTransaction")
 
         balance = account.balance
         if transactionType == "Expense":
+
+            # Ensure account has enough balance either currently or at the date the transaction is set
             if (balance < amount) or (balanceAtDate(date, accountID) < amount):
                 print(balanceAtDate(date, accountID))
                 flash(
@@ -406,6 +431,8 @@ def editAccount():
     if request.method == "POST":
         accountID = request.form.get("accountID")
         account = getAccount(accountID)
+
+        # Ensure user isn't a guest
         if checkGuest(userID):
             flash("Guests can't modify accounts", "error")
             return render_template(
@@ -413,6 +440,8 @@ def editAccount():
             )
         name = request.form.get("name")
         category = request.form.get("category")
+        
+        # Ensure name is submitted
         if isBlank(name):
             flash("Must input a name", "error")
             return render_template(
@@ -438,6 +467,8 @@ def editTransaction():
     if request.method == "POST":
         transactionID = request.form.get("transactionID")
         transaction = getTransaction(transactionID)
+
+        # Ensure user isn't a guest
         if checkGuest(userID):
             flash("Guests can't modify transactions", "error")
             return render_template(
@@ -447,6 +478,8 @@ def editTransaction():
             )
         name = request.form.get("name")
         category = request.form.get("category")
+
+        # Ensure inputs are submitted
         if isBlank(name):
             flash("Must input a name", "error")
             return render_template(
@@ -483,6 +516,8 @@ def deleteAccount():
     if request.method == "POST":
         accountID = request.form.get("accountID")
         account = getAccount(accountID)
+
+        # Ensure user isn't a guest
         if checkGuest(userID):
             flash("Guests can't delete accounts", "error")
             return render_template(
@@ -505,6 +540,8 @@ def deleteTransaction():
     if request.method == "POST":
         transactionID = request.form.get("transactionID")
         transaction = getTransaction(transactionID)
+
+        # Ensure user isn't a guest
         if checkGuest(userID):
             flash("Guests can't delete transactions", "error")
             return render_template(

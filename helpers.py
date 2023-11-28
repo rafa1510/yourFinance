@@ -7,11 +7,7 @@ GUEST_ACCOUNT_ID = 1
 
 
 def loginRequired(f):
-    """
-    Decorate routes to require login.
-
-    http://flask.pocoo.org/docs/0.12/patterns/viewdecorators/
-    """
+    # Decorate routes to require login.
 
     @wraps(f)
     def decoratedFunction(*args, **kwargs):
@@ -23,11 +19,12 @@ def loginRequired(f):
 
 
 def usd(value):
-    """Format value as USD."""
+    # Format value as USD.
     return f"${value:,.2f}"
 
 
 def dateToMonth(date):
+    # Used for getMonthTotals()
     month = date[5:7]
     if month[0] == "0":
         month = month[1:]
