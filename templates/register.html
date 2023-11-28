@@ -26,12 +26,12 @@
                 {% for category, message in messages %}
                     {% if category == "error" %}
                         <div class="flashLogoContainer errorContainer">
-                            <img src="static/errorIcon.svg">
+                            <img src="static/svgs/errorIcon.svg">
                         </div>
                         <li class="flashText">{{ message }}</li>
                     {% elif category == "success" %}
                         <div class="flashLogoContainer successContainer">
-                            <img src="static/successIcon.svg">
+                            <img src="static/svgs/successIcon.svg">
                         </div>
                         <li class="flashText">{{ message }}</li>
                     {% endif %}

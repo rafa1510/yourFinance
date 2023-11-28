@@ -1,6 +1,6 @@
 # yourFinance
 
-![yourFinance Logo](static/logo.png)
+![yourFinance Logo](static/branding/logo.png)
 
 yourFinance is a personal financial tracker designed to provide a seamless and user-friendly experience for expense & income tracking. The project is built using a diverse tech stack, including HTML, CSS, JavaScript, Python, Flask, SQLAlchemy, and Git.
 
@@ -35,15 +35,15 @@ yourFinance is designed to be responsive, providing an optimal user experience a
 
 ### Mobile View
 
-![Mobile View](static/mobile.png)
+![Mobile View](static/displays/mobile.png)
 
 ### Desktop Screen
 
-![Desktop View](static/desktop.png)
+![Desktop View](static/displays/desktop.png)
 
 ### Wide Screen
 
-![Wide View](static/widescreen.png)
+![Wide View](static/displays/widescreen.png)
 
 
 ## Usage
